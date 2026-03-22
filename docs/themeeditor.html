@@ -152,7 +152,6 @@
 </head>
 <body>
   <div class="app">
-    <!-- Controls -->
     <div class="panel">
       <div class="title">Theme Studio — Mobile</div>
       <div class="sub">View-based editor: only shows controls used by the active preview.</div>
@@ -161,6 +160,7 @@
         <div class="tab active" data-view="chat">Chat</div>
         <div class="tab" data-view="users">Users</div>
         <div class="tab" data-view="channels">Channels</div>
+        <div class="tab" data-view="serverList">Server List</div>
         <div class="tab" data-view="settings">Settings</div>
       </div>
 
@@ -187,24 +187,19 @@
       </div>
     </div>
 
-    <!-- Preview -->
     <div class="previewWrap">
       <div class="phone">
         <div class="status"></div>
         <div class="frame">
           <div class="views anim">
-            <!-- CHAT -->
             <div class="view active" data-view="chat">
-              <!-- Left rail -->
               <div class="rail">
                 <div class="server" title="Server A">A</div>
                 <div class="server" title="Add">+</div>
                 <div class="server" title="Server B">B</div>
               </div>
 
-              <!-- Chat column -->
               <div class="chatArea">
-                <!-- topbar -->
                 <div class="chatTopbar">
                   <div class="chatChan"># general</div>
                   <div class="chatActions">
@@ -220,9 +215,7 @@
                   </div>
                 </div>
 
-                <!-- messages -->
                 <div class="chatScroll">
-                  <!-- DemoUser -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
@@ -235,7 +228,6 @@
                     </div>
                   </div>
 
-                  <!-- AnotherUser -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
@@ -248,7 +240,6 @@
                     </div>
                   </div>
 
-                  <!-- AnotherUser follow-up -->
                   <div class="msgGroup follow">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
@@ -256,7 +247,6 @@
                     </div>
                   </div>
 
-                  <!-- BotUser + Embed -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
@@ -276,7 +266,6 @@
                   </div>
                 </div>
 
-                <!-- input -->
                 <div class="inputbar">
                   <div class="inputIcon" title="Attach">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 6.5l-7.09 7.09a2.5 2.5 0 01-3.54-3.54l7.79-7.79a4.5 4.5 0 116.36 6.36l-8.49 8.49a6.5 6.5 0 11-9.19-9.19l7.79-7.79"/></svg>
@@ -290,7 +279,6 @@
                   </button>
                 </div>
 
-                <!-- bottom nav -->
                 <div class="nav">
                   <div class="navBtn active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9H6v-9H3z"/></svg>Home</div>
                   <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Friends</div>
@@ -300,7 +288,6 @@
               </div>
             </div>
 
-            <!-- USERS -->
             <div class="view" data-view="users">
               <div class="rail">
                 <div class="server">A</div><div class="server">+</div><div class="server">B</div>
@@ -311,7 +298,6 @@
                   <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4z"/></svg></div></div>
                 </div>
 
-                <!-- Themes+ info row -->
                 <div class="row themesplus-bar">
                   <div class="ava ava-overlay"></div>
                   <div>
@@ -327,7 +313,6 @@
               </div>
             </div>
 
-            <!-- CHANNELS -->
             <div class="view" data-view="channels">
               <div class="rail">
                 <div class="server">A</div><div class="server">+</div><div class="server">B</div>
@@ -343,7 +328,6 @@
               </div>
             </div>
 
-            <!-- SETTINGS -->
             <div class="view" data-view="settings">
               <div class="rail">
                 <div class="server">A</div><div class="server">+</div><div class="server">B</div>
@@ -351,7 +335,7 @@
               <div class="scroll">
                 <div class="topbar">
                   <div class="titlebar">Settings</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg></div></div>
+                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.62-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg></div></div>
                 </div>
                 <div class="row"><div class="ava"></div><div><div class="name">Cards</div><div class="subtxt">Floating, borders</div></div><div class="pill">UI</div></div>
                 <div class="row"><div class="ava"></div><div><div class="name">Buttons</div><div class="subtxt">Brand, hover</div></div><div class="pill">OK</div></div>
@@ -359,8 +343,7 @@
               </div>
             </div>
 
-          </div><!-- /views -->
-        </div>
+          </div></div>
       </div>
     </div>
   </div>
@@ -441,6 +424,11 @@ const FIELDS = {
     {id:'bgAlt',label:'Channel row',type:'color'},
     {id:'bgFloating',label:'Header',type:'color'},
     {id:'brand',label:'Selected / accent',type:'color'},
+  ],
+  serverList:[
+    {id:'bgTertiary',label:'Rail background',type:'color',hint:'The side server list background'},
+    {id:'brand',label:'Server Icon (brand)',type:'color'},
+    {id:'brandHover',label:'Server Hover',type:'color'}
   ],
   settings:[
     {id:'cardSecondary',label:'Card secondary',type:'color'},
@@ -622,7 +610,6 @@ function buildJSON(){
     INTERACTIVE_ACTIVE:A(P.brand),
     INTERACTIVE_HOVER:A(P.brandHover),
     INTERACTIVE_MUTED:A(P.muted),
-    INTERACTIVE_NORMAL:A(P.text),
 
     MENTION_BACKGROUND:A("rgba(114,0,0,0.1)"),
     MENTION_FOREGROUND:A(P.brand),
@@ -674,7 +661,7 @@ function buildJSON(){
     BRAND_460:P.brand,BRAND_500:P.brand,BRAND_530:P.brand,BRAND_560:P.brandHover,BRAND_600:P.brand,BRAND_630:P.brand,BRAND_660:P.brand,BRAND_700:P.brand,BRAND_730:P.text,
 
     PLUM_1:P.text,PLUM_3:P.brand,PLUM_4:P.text,PLUM_6:P.text,PLUM_9:P.muted,PLUM_10:P.muted,PLUM_11:P.muted,PLUM_13:P.muted,
-    PLUM_15:P.brand,PLUM_16:P.bgSecondary,PLUM_17:P.bgPrimary,PLUM_18:P.bgAlt,PLUM_19:P.bgSecondary,PLUM_20:P.bgPrimary,PLUM_21:P.bgSecondary,PLUM_22:P.bgSecondary,PLUM_24:P.bgPrimary,PLUM_25:P.bgPrimary,
+    PLUM_15:P.brand,PLUM_16:P.bgSecondary,PLUM_17:P.bgPrimary,PLUM_18:P.bgAlt,PLUM_19:P.bgSecondary,PLUM_20:P.bgPrimary,PLUM_21:P.bgSecondary,PLUM_22:P.bgSecondary,PLUM_23:P.bgTertiary,PLUM_24:P.bgPrimary,PLUM_25:P.bgPrimary,
 
     PRIMARY_100:P.muted,PRIMARY_200:P.text,PRIMARY_300:P.brand,PRIMARY_330:P.text,PRIMARY_360:P.brand,PRIMARY_400:P.brandHover,
     PRIMARY_460:P.bgSecondary,PRIMARY_500:P.brand,PRIMARY_530:P.brand,PRIMARY_600:P.bgPrimary,PRIMARY_630:P.bgSecondary,
@@ -710,7 +697,12 @@ document.getElementById('tabs').addEventListener('click', e=>{
   const view = t.dataset.view; if(!view) return;
   $$('.tab',tabs).forEach(el=>el.classList.toggle('active', el===t));
   const container = document.querySelector('.views'); container.classList.add('anim');
-  $$('.view').forEach(v=>v.classList.toggle('active', v.dataset.view===view));
+  
+  // Handling standard views vs Server List tab logic
+  let targetView = view;
+  if(view === 'serverList') targetView = 'chat'; // Preview Chat view when editing Server List
+
+  $$('.view').forEach(v=>v.classList.toggle('active', v.dataset.view===targetView));
   activeView = view;
   renderControls();
 });
