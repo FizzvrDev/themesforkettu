@@ -236,5 +236,18 @@
     "WHITE_500": "#cbadff",
     "WHITE_630": "#d359ff"
   },
-  "spec": 2
+  "plus": {
+        "version": 0,
+        "customOverlays": true,
+        "icons": {
+            "ic_mic_neutral": "#006a68",
+            "ic_mic_muted_neutral": "#006a68",
+            "ic_soundboard":"#006a68",
+            "ic_soundboard_muted": "#006a68",
+            "ic_video": "#006a68",
+            "ic_video_disabled": "#006a68"
+        },
+        "iconpack":"rosiecord-plumpy"
+    },
+    "spec": 2
 }
