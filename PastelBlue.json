@@ -237,9 +237,17 @@
     "WHITE_630": "#a8c6ff"
   },
   "plus": {
-    "version": "0",
-    "iconPack": "rosiecord-plumpy",
-    "mentionLineColor": "#8ecbff"
-  },
-  "spec": 2
+        "version": 0,
+        "customOverlays": true,
+        "icons": {
+            "ic_mic_neutral": "#006a68",
+            "ic_mic_muted_neutral": "#006a68",
+            "ic_soundboard":"#006a68",
+            "ic_soundboard_muted": "#006a68",
+            "ic_video": "#006a68",
+            "ic_video_disabled": "#006a68"
+        },
+        "iconpack":"rosiecord-plumpy"
+    },
+    "spec": 2
 }
