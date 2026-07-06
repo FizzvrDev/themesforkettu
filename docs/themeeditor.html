@@ -83,7 +83,7 @@
   .ava{width:42px;height:42px;border-radius:14px;background:linear-gradient(160deg,var(--bgAlt),var(--bgSecondary));border:1px solid rgba(255,255,255,.06)}
   .pill{margin-left:auto;background:var(--bgAlt);color:var(--muted);font-size:11px;padding:4px 8px;border-radius:999px}
 
-  /* ---------- CHAT: realistic Discord mobile flow ---------- */
+  /* ---------- CHAT ---------- */
   .chatArea{grid-column:2/3;display:grid;grid-template-rows:auto 1fr auto auto}
   .chatScroll{overflow:auto;background:var(--bgPrimary);padding:12px 10px}
   .msgGroup{display:grid;grid-template-columns:42px 1fr;column-gap:10px;margin:14px 0}
@@ -93,7 +93,7 @@
   .msgName{font-weight:700;color:var(--textPrimary)}
   .msgTime{font-size:11px;color:var(--muted)}
   .msgLine{margin-top:4px;padding:4px 8px;border-radius:8px;color:var(--text);transition:background .15s}
-  .msgLine:hover{background: color-mix(in srgb, var(--brandHover) 12%, transparent)} /* BACKGROUND_MESSAGE_HOVER via brandHover */
+  .msgLine:hover{background: color-mix(in srgb, var(--brandHover) 12%, transparent)}
   .msgLine .link{color:var(--link);text-decoration:underline}
   .msgLine .link:hover{color:var(--brandHover)}
   .msgLine .mention{
@@ -138,21 +138,20 @@
   .chanRow .hash{width:22px;text-align:center;color:var(--muted)}
   .chanRow .name{font-weight:700}
 
-  /* Users specifics (Themes+ demo) */
+  /* Users specifics */
   .themesplus-bar{background:var(--bgAlt)}
   .ava-overlay{position:relative}
   .ava-overlay::after{content:''; position:absolute; inset:0; border-radius:14px;background:linear-gradient(145deg, rgba(255,255,255,.06), rgba(0,0,0,.18)); pointer-events:none}
   .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--bgFloating); color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s ease}
   .toast.show{opacity:1}
 
-  /* Hover mode highlighter (optional) */
+  /* Hover mode highlighter */
   .hovering .row:hover{outline:2px solid rgba(255,255,255,.12)}
   .hovering .inputbar:hover{outline:2px solid rgba(255,255,255,.12)}
 </style>
 </head>
 <body>
   <div class="app">
-    <!-- Controls -->
     <div class="panel">
       <div class="title">Theme Studio — Mobile</div>
       <div class="sub">View-based editor: only shows controls used by the active preview.</div>
@@ -187,83 +186,51 @@
       </div>
     </div>
 
-    <!-- Preview -->
     <div class="previewWrap">
       <div class="phone">
         <div class="status"></div>
         <div class="frame">
           <div class="views anim">
-            <!-- CHAT -->
             <div class="view active" data-view="chat">
-              <!-- Left rail -->
               <div class="rail">
                 <div class="server" title="Server A">A</div>
                 <div class="server" title="Add">+</div>
                 <div class="server" title="Server B">B</div>
               </div>
-
-              <!-- Chat column -->
               <div class="chatArea">
-                <!-- topbar -->
                 <div class="chatTopbar">
                   <div class="chatChan"># general</div>
                   <div class="chatActions">
-                    <div class="iconBtn" title="Search">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-4.23C15.91 6.01 13.4 3.5 10.45 3.5S5 6.01 5 9s2.51 5.5 5.45 5.5c1.61 0 3.09-.59 4.23-1.48l.27.28v.79L20 20.49 21.49 19 15.5 14zM10.45 13C8.3 13 6.59 11.29 6.59 9.14S8.3 5.27 10.45 5.27s3.86 1.71 3.86 3.86S12.6 13 10.45 13z"/></svg>
-                    </div>
-                    <div class="iconBtn" title="Members">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    </div>
-                    <div class="iconBtn" title="More">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg>
-                    </div>
+                    <div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-4.23C15.91 6.01 13.4 3.5 10.45 3.5S5 6.01 5 9s2.51 5.5 5.45 5.5c1.61 0 3.09-.59 4.23-1.48l.27.28v.79L20 20.49 21.49 19 15.5 14zM10.45 13C8.3 13 6.59 11.29 6.59 9.14S8.3 5.27 10.45 5.27s3.86 1.71 3.86 3.86S12.6 13 10.45 13z"/></svg></div>
+                    <div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+                    <div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg></div>
                   </div>
                 </div>
-
-                <!-- messages -->
                 <div class="chatScroll">
-                  <!-- DemoUser -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">DemoUser</span>
-                        <span class="msgTime">Today at 12:31</span>
-                      </div>
+                      <div class="msgHeader"><span class="msgName">DemoUser</span><span class="msgTime">Today at 12:31</span></div>
                       <div class="msgLine">Hey, this is the first message!</div>
                       <div class="msgLine">Here’s another line right after it.</div>
                     </div>
                   </div>
-
-                  <!-- AnotherUser -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">AnotherUser</span>
-                        <span class="msgTime">Today at 12:32</span>
-                      </div>
+                      <div class="msgHeader"><span class="msgName">AnotherUser</span><span class="msgTime">Today at 12:32</span></div>
                       <div class="msgLine">Hello there <span class="mention">@DemoUser</span>, check this out:</div>
-                      <div class="msgLine"><a class="link" href="https://discord.gg/example" target="_blank" rel="noreferrer">https://discord.gg/example</a></div>
+                      <div class="msgLine"><a class="link" href="#">https://discord.gg/example</a></div>
                     </div>
                   </div>
-
-                  <!-- AnotherUser follow-up -->
                   <div class="msgGroup follow">
                     <div class="msgAvatar"></div>
-                    <div class="msgBlock">
-                      <div class="msgLine">One more line to show stacked messages.</div>
-                    </div>
+                    <div class="msgBlock"><div class="msgLine">One more line to show stacked messages.</div></div>
                   </div>
-
-                  <!-- BotUser + Embed -->
                   <div class="msgGroup">
                     <div class="msgAvatar"></div>
                     <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">BotUser</span>
-                        <span class="msgTime">Today at 12:33</span>
-                      </div>
+                      <div class="msgHeader"><span class="msgName">BotUser</span><span class="msgTime">Today at 12:33</span></div>
                       <div class="msgLine">Here’s an embed preview:</div>
                       <div class="embed">
                         <div class="accent"></div>
@@ -275,92 +242,57 @@
                     </div>
                   </div>
                 </div>
-
-                <!-- input -->
                 <div class="inputbar">
-                  <div class="inputIcon" title="Attach">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 6.5l-7.09 7.09a2.5 2.5 0 01-3.54-3.54l7.79-7.79a4.5 4.5 0 116.36 6.36l-8.49 8.49a6.5 6.5 0 11-9.19-9.19l7.79-7.79"/></svg>
-                  </div>
+                  <div class="inputIcon"><svg class="icon" viewBox="0 0 24 24"><path d="M17.5 6.5l-7.09 7.09a2.5 2.5 0 01-3.54-3.54l7.79-7.79a4.5 4.5 0 116.36 6.36l-8.49 8.49a6.5 6.5 0 11-9.19-9.19l7.79-7.79"/></svg></div>
                   <input placeholder="Message #general" />
-                  <div class="inputIcon" title="Emoji">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm-3 7a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 019 9zm9 3a6 6 0 11-6-6 6 6 0 016 6zm-3 3a4 4 0 01-8 0z"/></svg>
-                  </div>
-                  <button class="send" title="Send">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" /></svg>
-                  </button>
+                  <div class="inputIcon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm-3 7a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 019 9zm9 3a6 6 0 11-6-6 6 6 0 016 6zm-3 3a4 4 0 01-8 0z"/></svg></div>
+                  <button class="send"><svg class="icon" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" /></svg></button>
                 </div>
-
-                <!-- bottom nav -->
                 <div class="nav">
                   <div class="navBtn active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9H6v-9H3z"/></svg>Home</div>
-                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Friends</div>
-                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4zm0-6a2 2 0 012 2v2a2 2 0 01-4 0V4a2 2 0 012-2zM4 12a2 2 0 012-2h2a2 2 0 010 4H6a2 2 0 01-2-2zm12 6a2 2 0 012-2h2a2 2 0 010 4h-2a2 2 0 01-2-2zM4 20a2 2 0 012-2h2a2 2 0 010 4H6a2 2 0 01-2-2z"/></svg>Activity</div>
+                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13z"/></svg>Friends</div>
+                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4zm0-6a2 2 0 012 2v2a2 2 0 01-4 0V4a2 2 0 012-2zM4 12a2 2 0 012-2h2a2 2 0 010 4H6a2 2 0 01-2-2z"/></svg>Activity</div>
                   <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg>Settings</div>
                 </div>
               </div>
             </div>
 
-            <!-- USERS -->
             <div class="view" data-view="users">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
+              <div class="rail"><div class="server">A</div><div class="server">+</div><div class="server">B</div></div>
               <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Members</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4z"/></svg></div></div>
-                </div>
-
-                <!-- Themes+ info row -->
+                <div class="topbar"><div class="titlebar">Members</div></div>
                 <div class="row themesplus-bar">
                   <div class="ava ava-overlay"></div>
                   <div>
                     <div class="name">Icon Pack: <span id="packName">rosiecord-plumpy</span></div>
-                    <div class="subtxt">Overlays: <span id="overlayState">enabled</span> • Mention → <span class="mention">@you</span></div>
+                    <div class="subtxt">Overlays: <span id="overlayState">enabled</span></div>
                   </div>
                   <button class="pill" id="showToastBtn" type="button">Toast</button>
                 </div>
-
-                <div class="row"><div class="ava"></div><div><div class="name">Member One</div><div class="subtxt">Online • @Role</div></div><div class="pill">MOD</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Member Two</div><div class="subtxt">Idle • @Role</div></div><div class="pill">VIP</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Member Three</div><div class="subtxt">Offline • @Role</div></div><div class="pill">GUEST</div></div>
+                <div class="row"><div class="ava"></div><div><div class="name">Member One</div><div class="subtxt">Online</div></div><div class="pill">MOD</div></div>
+                <div class="row"><div class="ava"></div><div><div class="name">Member Two</div><div class="subtxt">Idle</div></div><div class="pill">VIP</div></div>
               </div>
             </div>
 
-            <!-- CHANNELS -->
             <div class="view" data-view="channels">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
+              <div class="rail"><div class="server">A</div><div class="server">+</div><div class="server">B</div></div>
               <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Channels</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M15 3H9v4H5v6h4v4h6v-4h4V7h-4z"/></svg></div></div>
-                </div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">general</div><div class="subtxt">Category • Server</div></div><div class="pill">NEW</div></div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">random</div><div class="subtxt">Category • Server</div></div><div class="pill">5</div></div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">media</div><div class="subtxt">Category • Server</div></div><div class="pill">•</div></div>
+                <div class="topbar"><div class="titlebar">Channels</div></div>
+                <div class="row chanRow"><div class="hash">#</div><div><div class="name">general</div><div class="subtxt">Category</div></div><div class="pill">NEW</div></div>
+                <div class="row chanRow"><div class="hash">#</div><div><div class="name">random</div><div class="subtxt">Category</div></div><div class="pill">5</div></div>
               </div>
             </div>
 
-            <!-- SETTINGS -->
             <div class="view" data-view="settings">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
+              <div class="rail"><div class="server">A</div><div class="server">+</div><div class="server">B</div></div>
               <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Settings</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg></div></div>
-                </div>
+                <div class="topbar"><div class="titlebar">Settings</div></div>
                 <div class="row"><div class="ava"></div><div><div class="name">Cards</div><div class="subtxt">Floating, borders</div></div><div class="pill">UI</div></div>
                 <div class="row"><div class="ava"></div><div><div class="name">Buttons</div><div class="subtxt">Brand, hover</div></div><div class="pill">OK</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Scrollbars</div><div class="subtxt">Thin / auto thumb</div></div><div class="pill">FX</div></div>
               </div>
             </div>
 
-          </div><!-- /views -->
-        </div>
+          </div></div>
       </div>
     </div>
   </div>
@@ -397,7 +329,7 @@ const PRESETS = {
   }
 };
 
-/* ============== Field sets by view (context-aware) ============== */
+/* ============== Field sets ============== */
 const FIELDS = {
   meta:[
     {id:'name', label:'Name', type:'text', group:'Meta'},
@@ -412,6 +344,7 @@ const FIELDS = {
     {id:'customOverlays', label:'Custom Overlays', type:'checkbox', group:'Themes+'},
   ],
   chat:[
+    {id:'bgTertiary',label:'Server List',type:'color',hint:'Server List Background'},
     {id:'brand',label:'Brand',type:'color',hint:'Buttons, accents'},
     {id:'brandHover',label:'Brand (hover)',type:'color'},
     {id:'link',label:'Link',type:'color'},
@@ -425,6 +358,7 @@ const FIELDS = {
     {id:'input',label:'Input background',type:'color'},
     {id:'bgAlt',label:'Active row/card',type:'color'},
     {id:'mentionLineColor',label:'Mention line',type:'color'},
+    
   ],
   users:[
     {id:'textPrimary',label:'Name text',type:'color'},
@@ -454,7 +388,6 @@ const FIELDS = {
   ],
 };
 
-/* ============== DOM helpers & state ============== */
 const $ = (s,root=document)=>root.querySelector(s);
 const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
 const root = document.documentElement;
@@ -463,9 +396,8 @@ const A = v => [v];
 
 let activeView = 'chat';
 let showAll = false;
-let state = JSON.parse(JSON.stringify(PRESETS.purple)); // deep clone
+let state = JSON.parse(JSON.stringify(PRESETS.purple));
 
-/* ============== Controls rendering ============== */
 const controls = document.getElementById('controls');
 
 function fieldHTML(f){
@@ -474,14 +406,7 @@ function fieldHTML(f){
     : f.type==='checkbox'
       ? `<label style="display:flex;gap:8px;align-items:center"><input id="${f.id}" type="checkbox"> enabled</label>`
       : `<input id="${f.id}" type="${f.type}" ${f.type==='color'?'value="#000000"':''}>`;
-  return `
-  <div class="field" data-key="${f.id}">
-    <div class="left">
-      <label for="${f.id}">${f.label}</label>
-      ${f.hint?`<div class="hint">${f.hint}</div>`:''}
-    </div>
-    ${right}
-  </div>`;
+  return `<div class="field" data-key="${f.id}"><div class="left"><label for="${f.id}">${f.label}</label>${f.hint?`<div class="hint">${f.hint}</div>`:''}</div>${right}</div>`;
 }
 
 function groupHTML(title, items){ return `<div class="section"><h2>${title}</h2><div class="fields">${items.map(fieldHTML).join('')}</div></div>`; }
@@ -496,7 +421,6 @@ function renderControls(){
   populateFromState();
 }
 
-/* ============== Apply/populate ============== */
 function applyPalette(p){
   Object.entries(p).forEach(([k,v])=>{
     setVar(k,v);
@@ -508,18 +432,14 @@ function applyPalette(p){
   });
   const ml = document.getElementById('mentionLineColor');
   if(ml) ml.value = p.mentionLine || '#8ecbff';
-  // defensive defaults for icon tints
   root.style.setProperty('--icon', p.text || '#e6e6e6');
-  root.style.setProperty('--iconMuted', '#8a8a8a');
 }
 
 function updateThemesPlusIndicators(){
   const pack = state.plus?.iconPack || 'default';
   const overlays = !!state.plus?.customOverlays;
-  const nameEl = document.getElementById('packName');
-  const ovEl = document.getElementById('overlayState');
-  if (nameEl) nameEl.textContent = pack;
-  if (ovEl) ovEl.textContent = overlays ? 'enabled' : 'disabled';
+  if(document.getElementById('packName')) document.getElementById('packName').textContent = pack;
+  if(document.getElementById('overlayState')) document.getElementById('overlayState').textContent = overlays ? 'enabled' : 'disabled';
 }
 
 function populateFromState(){
@@ -527,11 +447,9 @@ function populateFromState(){
   const setV = (id,val)=>{ const el=document.getElementById(id); if(el) el.value = val??''; };
   setV('name',m.name); setV('desc',m.desc); setV('ver',m.version);
   setV('authN',m.author?.name||''); setV('authI',m.author?.id||'');
-  // plus
   const ip = document.getElementById('iconPack'); if(ip) ip.value = state.plus?.iconPack || 'default';
   const co = document.getElementById('customOverlays'); if(co) co.checked = !!state.plus?.customOverlays;
   const ml = document.getElementById('mentionLineColor'); if(ml) ml.value = state.palette.mentionLine || '#8ecbff';
-  // palette
   applyPalette(state.palette);
   updateThemesPlusIndicators();
   buildJSON();
@@ -539,9 +457,7 @@ function populateFromState(){
 
 function setPreset(key){ state = JSON.parse(JSON.stringify(PRESETS[key])); applyPalette(state.palette); renderControls(); buildJSON(); }
 
-/* ============== Inputs ============== */
 function wireInputs(){
-  // meta
   ['name','desc','ver','authN','authI'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.oninput = ()=>{
@@ -553,11 +469,9 @@ function wireInputs(){
       buildJSON();
     };
   });
-  // plus
   const ip = document.getElementById('iconPack'); if(ip) ip.oninput = ()=>{ state.plus.iconPack = ip.value; updateThemesPlusIndicators(); buildJSON(); };
   const co = document.getElementById('customOverlays'); if(co) co.oninput = ()=>{ state.plus.customOverlays = co.checked; updateThemesPlusIndicators(); buildJSON(); };
   const ml = document.getElementById('mentionLineColor'); if(ml) ml.oninput = ()=>{ state.palette.mentionLine = ml.value; setVar('mentionLine', ml.value); buildJSON(); };
-  // colors
   const ids = ['brand','brandHover','link','text','muted','textPrimary','textSecond','bgPrimary','bgSecondary','bgAlt','bgTertiary','bgFloating','bgNested','cardPrimary','cardSecondary','input','success','warning','danger','ripple','scrollbar'];
   ids.forEach(k=>{
     const el = document.getElementById(k);
@@ -570,7 +484,6 @@ function wireInputs(){
     };
   });
 }
-
 /* ============== JSON Builder (spec:2 + plus) ============== */
 function buildJSON(){
   const P = state.palette, meta = state.meta, plus = state.plus||{};
@@ -674,7 +587,7 @@ function buildJSON(){
     BRAND_460:P.brand,BRAND_500:P.brand,BRAND_530:P.brand,BRAND_560:P.brandHover,BRAND_600:P.brand,BRAND_630:P.brand,BRAND_660:P.brand,BRAND_700:P.brand,BRAND_730:P.text,
 
     PLUM_1:P.text,PLUM_3:P.brand,PLUM_4:P.text,PLUM_6:P.text,PLUM_9:P.muted,PLUM_10:P.muted,PLUM_11:P.muted,PLUM_13:P.muted,
-    PLUM_15:P.brand,PLUM_16:P.bgSecondary,PLUM_17:P.bgPrimary,PLUM_18:P.bgAlt,PLUM_19:P.bgSecondary,PLUM_20:P.bgPrimary,PLUM_21:P.bgSecondary,PLUM_22:P.bgSecondary,PLUM_24:P.bgPrimary,PLUM_25:P.bgPrimary,
+    PLUM_15:P.brand,PLUM_16:P.bgSecondary,PLUM_17:P.bgPrimary,PLUM_18:P.bgAlt,PLUM_19:P.bgSecondary,PLUM_20:P.bgPrimary,PLUM_21:P.bgSecondary,PLUM_22:P.bgSecondary,PLUM_23:P.bgTertiary,PLUM_24:P.bgPrimary,PLUM_25:P.bgPrimary,
 
     PRIMARY_100:P.muted,PRIMARY_200:P.text,PRIMARY_300:P.brand,PRIMARY_330:P.text,PRIMARY_360:P.brand,PRIMARY_400:P.brandHover,
     PRIMARY_460:P.bgSecondary,PRIMARY_500:P.brand,PRIMARY_530:P.brand,PRIMARY_600:P.bgPrimary,PRIMARY_630:P.bgSecondary,
@@ -703,7 +616,6 @@ function buildJSON(){
   document.getElementById('jsonOut').value = JSON.stringify(obj,null,2);
   return obj;
 }
-
 /* ============== Tabs / toggles / presets / import-export ============== */
 document.getElementById('tabs').addEventListener('click', e=>{
   const t = e.target.closest('.tab'); if(!t) return;
