@@ -1,799 +1,325 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Theme Studio — Mobile (Alpha)</title>
-<style>
-  :root{
-    /* Live palette (overridden by JS) */
-    --brand:#8200c8; --brandHover:#3d007a; --link:#8200c8;
-    --text:#cbadff; --muted:#d359ff; --textPrimary:#e9d9ff; --textSecond:#d79dff;
-    --bgPrimary:#0f0f10; --bgSecondary:#121214; --bgAlt:#101012; --bgTertiary:#0c0c0e; --bgFloating:#0f0f12; --bgNested:#0e0e10;
-    --cardPrimary:#0e0e10; --cardSecondary:#0f0f12; --input:#121214;
-    --success:#43b581; --warning:#faa61a; --danger:#7f007b;
-    --ripple:#5b2a82; --scrollbar:#2b2b2b; --mentionLine:#b592e6;
-    --icon:#cbadff; --iconMuted:#8a8a8a;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bgPrimary);color:var(--text);font:14px/1.45 Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  .app{display:grid;grid-template-columns:360px 1fr;height:100vh}
-  @media (max-width:1100px){ .app{grid-template-columns:1fr} }
-
-  /* Left: Controls */
-  .panel{background:var(--bgSecondary);border-right:1px solid rgba(255,255,255,.06);padding:14px 16px;overflow:auto}
-  .title{font-weight:800;color:var(--textPrimary);font-size:18px;margin:0 0 4px}
-  .sub{color:var(--muted);font-size:12px;margin:0 0 12px}
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
-  .tab{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:var(--bgAlt);color:var(--text);cursor:pointer;font-weight:600}
-  .tab.active{background:var(--brand);border-color:transparent;color:#0b0212}
-  .toolbar{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
-  .toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer}
-  .toggle input{transform:translateY(1px)}
-  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  button{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--bgAlt);color:var(--text);cursor:pointer}
-  button.primary{background:var(--brand);border-color:transparent;color:#0a0312;font-weight:800}
-  button.ghost{background:transparent}
-  .section{margin:12px 0 16px}
-  .section h2{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
-  .fields{display:flex;flex-direction:column;gap:8px}
-  .field{display:grid;grid-template-columns:1fr 120px;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:8px}
-  .left{display:flex;flex-direction:column}
-  .left label{font-size:13px;font-weight:700;color:var(--text)}
-  .hint{font-size:11px;color:var(--muted)}
-  input[type="text"],select{width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:var(--input);color:var(--text)}
-  input[type="color"]{width:100%;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;padding:0}
-  textarea{width:100%;min-height:220px;background:#0b0b0d;color:#d5d6db;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-
-  /* Right: Preview (Phone) */
-  .previewWrap{background:var(--bgPrimary);display:flex;justify-content:center;align-items:center;padding:16px}
-  .phone{width:392px;max-width:100%;height:calc(100vh - 32px);background:var(--bgSecondary);border:1px solid rgba(255,255,255,.06);border-radius:28px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45);display:flex;flex-direction:column}
-  .status{height:18px;background:var(--bgSecondary)}
-  .frame{position:relative;flex:1;overflow:hidden}
-  .view{position:absolute;inset:0;display:grid;grid-template-columns:64px 1fr;opacity:0;transform:translateX(24px);pointer-events:none}
-  .view.active{opacity:1;transform:none;pointer-events:auto}
-  .views.anim .view{transition:opacity .24s ease, transform .24s ease}
-
-  /* Server rail */
-  .rail{background:var(--bgTertiary);padding:10px 8px;display:flex;flex-direction:column;gap:12px;align-items:center}
-  .server{width:48px;height:48px;border-radius:16px;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;cursor:pointer;transition:transform .2s, box-shadow .2s, background .2s}
-  .server:hover{transform:scale(1.05); box-shadow:0 6px 20px rgba(0,0,0,.35); background:var(--brandHover)}
-
-  /* Top bar */
-  .chatTopbar,.topbar{grid-column:2/3;background:var(--bgFloating);padding:12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
-  .chatChan,.titlebar{font-weight:800;color:var(--textPrimary)}
-  .chatChan:hover{color:var(--brandHover)}
-  .chatActions,.icons{margin-left:auto;display:flex;gap:8px}
-  .iconBtn{width:28px;height:28px;border-radius:8px;background:var(--bgAlt);display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,.06);transition:background .2s, border-color .2s}
-  .iconBtn:hover{background:var(--brandHover);border-color:transparent}
-  .icon{width:16px;height:16px;fill:var(--icon)}
-  .iconBtn:hover .icon{fill:#ffffff}
-
-  /* Scroll container */
-  .scroll{grid-column:2/3;overflow:auto;background:var(--bgPrimary);padding:10px}
-
-  /* Common row card */
-  .row{display:flex;gap:10px;align-items:center;background:var(--bgAlt);border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:8px 10px;margin:8px 0;transition:background .2s, border-color .2s}
-  .row:hover{
-    background: color-mix(in srgb, #ffffff 6%, var(--bgAlt));
-    border-color: color-mix(in srgb, #ffffff 14%, transparent);
-  }
-  .name{font-weight:700;color:var(--textPrimary)}
-  .subtxt{color:var(--muted);font-size:12px}
-  .ava{width:42px;height:42px;border-radius:14px;background:linear-gradient(160deg,var(--bgAlt),var(--bgSecondary));border:1px solid rgba(255,255,255,.06)}
-  .pill{margin-left:auto;background:var(--bgAlt);color:var(--muted);font-size:11px;padding:4px 8px;border-radius:999px}
-
-  /* ---------- CHAT: realistic Discord mobile flow ---------- */
-  .chatArea{grid-column:2/3;display:grid;grid-template-rows:auto 1fr auto auto}
-  .chatScroll{overflow:auto;background:var(--bgPrimary);padding:12px 10px}
-  .msgGroup{display:grid;grid-template-columns:42px 1fr;column-gap:10px;margin:14px 0}
-  .msgAvatar{width:42px;height:42px;border-radius:14px;background:linear-gradient(160deg,var(--bgAlt),var(--bgSecondary));border:1px solid rgba(255,255,255,.06)}
-  .msgBlock{min-width:0}
-  .msgHeader{display:flex;gap:8px;align-items:baseline}
-  .msgName{font-weight:700;color:var(--textPrimary)}
-  .msgTime{font-size:11px;color:var(--muted)}
-  .msgLine{margin-top:4px;padding:4px 8px;border-radius:8px;color:var(--text);transition:background .15s}
-  .msgLine:hover{background: color-mix(in srgb, var(--brandHover) 12%, transparent)} /* BACKGROUND_MESSAGE_HOVER via brandHover */
-  .msgLine .link{color:var(--link);text-decoration:underline}
-  .msgLine .link:hover{color:var(--brandHover)}
-  .msgLine .mention{
-    background:rgba(114,0,0,0.1);
-    color:var(--brand);
-    padding:1px 6px;border-radius:6px;box-shadow:inset 3px 0 0 var(--mentionLine);
-    transition:background .15s, box-shadow .15s, color .15s
-  }
-  .msgLine .mention:hover{
-    background:rgba(170,0,0,0.12);
-    box-shadow:inset 3px 0 0 var(--brandHover);
-    color:var(--brandHover);
-  }
-  .msgGroup.follow .msgAvatar{visibility:hidden}
-  .msgGroup.follow .msgHeader{display:none}
-
-  /* embed */
-  .embed{margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:var(--bgFloating);display:grid;grid-template-columns:6px 1fr}
-  .embed .accent{background:var(--brand)}
-  .embed .body{padding:10px}
-  .embed .title{font-weight:800;color:var(--textPrimary);margin-bottom:4px}
-  .embed .desc{color:var(--text);opacity:.9}
-
-  /* input bar */
-  .inputbar{background:var(--input);padding:8px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;align-items:center}
-  .inputIcon{width:34px;height:34px;border-radius:10px;background:var(--bgAlt);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s, border-color .2s}
-  .inputIcon:hover{background:var(--brandHover);border-color:transparent}
-  .inputbar input{flex:1;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:var(--bgAlt);color:var(--text)}
-  .send{width:38px;height:38px;border-radius:999px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;border:0;transition:background .2s}
-  .send:hover{background:var(--brandHover)}
-
-  /* bottom nav */
-  .nav{height:54px;background:var(--bgSecondary);display:flex;align-items:center;justify-content:space-around;border-top:1px solid rgba(255,255,255,.06)}
-  .navBtn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;transition:color .2s, background .2s}
-  .navBtn .icon{fill:var(--iconMuted)}
-  .navBtn.active{color:var(--brand)}
-  .navBtn.active .icon{fill:var(--brand)}
-  .navBtn:hover{background: color-mix(in srgb, var(--brandHover) 12%, var(--bgSecondary)); color: var(--brandHover)}
-  .navBtn:hover .icon{fill:var(--brandHover)}
-
-  /* Channels specifics */
-  .chanRow .hash{width:22px;text-align:center;color:var(--muted)}
-  .chanRow .name{font-weight:700}
-
-  /* Users specifics (Themes+ demo) */
-  .themesplus-bar{background:var(--bgAlt)}
-  .ava-overlay{position:relative}
-  .ava-overlay::after{content:''; position:absolute; inset:0; border-radius:14px;background:linear-gradient(145deg, rgba(255,255,255,.06), rgba(0,0,0,.18)); pointer-events:none}
-  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--bgFloating); color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,.45); opacity:0; pointer-events:none; transition:opacity .2s ease}
-  .toast.show{opacity:1}
-
-  /* Hover mode highlighter (optional) */
-  .hovering .row:hover{outline:2px solid rgba(255,255,255,.12)}
-  .hovering .inputbar:hover{outline:2px solid rgba(255,255,255,.12)}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f0f10">
+  <title>Nightshade — Theme Studio</title>
+  <style>
+    :root { color-scheme: dark; --page: #0b0a0e; --panel: #15121b; --panel-alt: #1d1725; --line: #ffffff17; --text: #f2eaff; --muted: #b9a7ca; --accent: #8200c8; --accent-hover: #a637e7; --preview-base: #0f0f10; --preview-surface: #121214; --preview-raised: #0f0f12; --preview-text: #e9d9ff; --preview-message-text: #e9d9ff; --preview-name: #f2eaff; --preview-muted: #d359ff; --ease: cubic-bezier(.2, .8, .2, 1); }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; margin: 0; font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--text); background: radial-gradient(circle at 85% -10%, #4c097925, transparent 34rem), var(--page); }
+    button, input, select { font: inherit; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); }
+    button { cursor: pointer; }
+    .app { width: min(1440px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 42px; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 26px; border-bottom: 1px solid var(--line); animation: rise-in .45s var(--ease) both; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #bc5efc66; border-radius: 13px; background: linear-gradient(145deg, #b64dff, #4e097d); box-shadow: 0 12px 30px #7800bc38; font-size: 20px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 18px; letter-spacing: .01em; }
+    .eyebrow { margin-bottom: 2px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+    .status { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #a66bff; box-shadow: 0 0 0 4px #a66bff20; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(380px, .9fr); gap: 24px; padding-top: 25px; }
+    .controls { display: grid; gap: 18px; align-content: start; }
+    .card { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(150deg, #1a1521d9, #110f15e6); box-shadow: 0 16px 45px #00000020; animation: rise-in .42s var(--ease) both; transition: transform .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease); }
+    .controls .card:nth-child(1) { animation-delay: .04s; } .controls .card:nth-child(2) { animation-delay: .08s; } .controls .card:nth-child(3) { animation-delay: .12s; } .controls .card:nth-child(4) { animation-delay: .16s; } .controls .card:nth-child(5) { animation-delay: .2s; }
+    @media (hover: hover) { .card:hover { border-color: #ffffff28; box-shadow: 0 20px 50px #00000032; } }
+    .card-title { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+    .card-title h2 { font-size: 14px; }
+    .card-title span { color: var(--muted); font-size: 12px; }
+    .card-body { padding: 18px; }
+    .mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mode-switch .button[aria-pressed="true"] { border-color: #c362ff; background: #7b16b72b; color: #f6eaff; box-shadow: inset 0 0 0 1px #b84df344; }
+    .control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .control-grid.colors { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 650; }
+    input[type="text"], input[type="url"], select { width: 100%; height: 40px; border: 1px solid #ffffff17; border-radius: 10px; outline: none; color: var(--text); background: #0d0b11; padding: 0 11px; transition: border-color .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease); }
+    input[type="text"]:focus, input[type="url"]:focus, select:focus { border-color: #b84df3; box-shadow: 0 0 0 3px #b84df320; }
+    .color-input { display: flex; align-items: center; overflow: hidden; height: 40px; border: 1px solid #ffffff17; border-radius: 10px; background: #0d0b11; transition: border-color .18s var(--ease), box-shadow .18s var(--ease), transform .18s var(--ease); }
+    @media (hover: hover) { .color-input:hover { border-color: #ffffff2d; } }
+    .color-input:focus-within { border-color: #b84df3; box-shadow: 0 0 0 3px #b84df320; }
+    input[type="color"] { width: 42px; height: 100%; flex: 0 0 42px; border: 0; background: transparent; padding: 5px; cursor: pointer; }
+    .color-input input[type="text"] { height: 100%; border: 0; border-radius: 0; box-shadow: none; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; text-transform: uppercase; }
+    input[type="range"] { width: 100%; accent-color: #b84df3; cursor: pointer; }
+    input[type="range"]::-webkit-slider-thumb { width: 17px; height: 17px; border: 2px solid #f5dfff; border-radius: 50%; background: #b84df3; box-shadow: 0 2px 7px #7d11bb80; }
+    .range-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    output { color: var(--text); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+    .background-settings { display: grid; gap: 14px; }
+    .background-settings[hidden] { display: none; }
+    .background-settings .wide { grid-column: 1 / -1; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; color: var(--text); font-size: 13px; font-weight: 700; }
+    .toggle-row input { position: absolute; opacity: 0; }
+    .toggle { width: 44px; height: 25px; flex: 0 0 44px; border-radius: 99px; background: #ffffff20; padding: 3px; transition: background .18s ease; cursor: pointer; }
+    .toggle::after { display: block; width: 19px; height: 19px; border-radius: 50%; background: #ffffff; content: ""; box-shadow: 0 1px 3px #0006; transition: transform .18s ease; }
+    .toggle-row input:checked + .toggle { background: var(--accent); }
+    .toggle-row input:checked + .toggle::after { transform: translateX(19px); }
+    .hint { margin-top: 10px; color: #93859f; font-size: 12px; }
+    .icon-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .icon-option { position: relative; }
+    .icon-option input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .icon-option span { display: grid; min-height: 38px; place-items: center; border: 1px solid #ffffff15; border-radius: 9px; color: #baa9c8; background: #0d0b11; font-size: 11px; text-align: center; transition: .18s ease; }
+    .icon-option input:checked + span { border-color: #b84df3; color: #f6eaff; background: #7b16b72b; box-shadow: inset 0 0 0 1px #b84df344; }
+    .icon-label { display: flex; align-items: center; gap: 7px; }
+    .element-glyph { display: inline-grid; width: 18px; height: 18px; place-items: center; color: #006a68; }
+    .element-glyph svg { width: 18px; height: 18px; fill: currentColor; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .link-import { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; width: 100%; margin-top: 12px; }
+    .button { min-height: 40px; border: 1px solid transparent; border-radius: 10px; padding: 0 14px; color: var(--text); background: #2a2033; font-weight: 700; transition: transform .18s, background .18s, border-color .18s; }
+    .button:hover { transform: translateY(-1px); background: #382843; }
+    .button.primary { border-color: #c362ff; background: linear-gradient(135deg, #9f21da, #65009e); box-shadow: 0 8px 20px #8300c62e; }
+    .button.primary:hover { background: linear-gradient(135deg, #bd4ff2, #7c09bd); }
+    .button.ghost { border-color: #ffffff1c; background: transparent; color: #d9c8e6; }
+    .preview-column { min-width: 0; }
+    .preview-wrap { position: sticky; top: 22px; }
+    .preview { overflow: hidden; min-height: 590px; border: 1px solid #ffffff19; border-radius: 18px; color: var(--preview-text); background: var(--preview-base); box-shadow: 0 20px 60px #00000052; animation: rise-in .55s .1s var(--ease) both; }
+    .preview-header { display: flex; align-items: center; justify-content: space-between; height: 55px; padding: 0 17px; border-bottom: 1px solid #ffffff14; color: var(--preview-text); background: color-mix(in srgb, var(--preview-surface) 87%, transparent); }
+    .preview-brand { display: flex; align-items: center; gap: 9px; font-weight: 750; }
+    .preview-brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .preview-actions { color: var(--preview-muted); letter-spacing: 3px; }
+    .preview-content { --preview-panel-opacity: 100%; display: grid; grid-template-columns: 152px minmax(0, 1fr); min-height: 535px; background: linear-gradient(#00000020, #00000020), var(--preview-background, none); background-position: center; background-size: cover; }
+    .sidebar { padding: 14px 9px; border-right: 1px solid #ffffff10; background: color-mix(in srgb, var(--preview-surface) var(--preview-panel-opacity), transparent); }
+    .workspace { padding: 23px 20px; background: color-mix(in srgb, var(--preview-base) var(--preview-panel-opacity), transparent); }
+    .side-label { padding: 0 8px 9px; color: var(--preview-muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .channel { display: flex; align-items: center; gap: 7px; margin: 3px 0; padding: 7px 8px; border-radius: 7px; color: var(--preview-muted); font-size: 12px; }
+    .channel.active { color: var(--preview-text); background: #ffffff12; }
+    .channel b { color: var(--accent); font-weight: 800; }
+    .workspace h3 { color: var(--preview-text); font-size: 16px; }
+    .workspace .topic { margin-top: 3px; color: var(--preview-muted); font-size: 12px; }
+    .message { display: grid; grid-template-columns: 31px minmax(0, 1fr); gap: 10px; margin-top: 22px; }
+    .avatar { display: grid; width: 31px; height: 31px; place-items: center; border-radius: 50%; background: var(--accent); color: white; font-size: 12px; font-weight: 800; }
+    .message strong { color: var(--preview-name); font-size: 13px; }
+    .message time { margin-left: 6px; color: var(--preview-muted); font-size: 10px; }
+    .message p { margin-top: 3px; color: var(--preview-message-text); font-size: 12px; }
+    .chip { display: inline-block; margin-top: 11px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 6px; padding: 4px 7px; color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); font-size: 11px; }
+    .composer { display: flex; align-items: center; gap: 10px; margin-top: 28px; border: 1px solid #ffffff12; border-radius: 9px; padding: 10px 12px; color: var(--preview-muted); background: var(--preview-raised); font-size: 12px; }
+    .composer span { margin-left: auto; color: var(--accent); font-size: 16px; }
+    @media (hover: hover) and (min-width: 621px) {
+      .channel, .message, .composer, .preview-header { transition: background .16s ease, color .16s ease, box-shadow .16s ease; }
+      .channel:hover { color: var(--preview-text); background: color-mix(in srgb, var(--accent-hover) 22%, transparent); cursor: pointer; }
+      .message:hover { border-radius: 7px; background: color-mix(in srgb, var(--accent-hover) 12%, transparent); cursor: pointer; }
+      .message.mention:hover { background: color-mix(in srgb, var(--accent-hover) 24%, transparent); }
+      .composer:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-hover) 72%, transparent); cursor: text; }
+      .preview-header:hover { background: color-mix(in srgb, var(--preview-surface) 68%, var(--accent-hover)); }
+    }
+    .preview-hover-toggle { display: none; }
+    .toast { position: fixed; z-index: 5; right: 20px; bottom: 20px; max-width: calc(100vw - 40px); border: 1px solid #d880ff66; border-radius: 11px; padding: 11px 14px; color: #f9efff; background: #2c123cf2; box-shadow: 0 15px 35px #0008; font-weight: 650; opacity: 0; pointer-events: none; transform: translateY(12px); transition: .2s var(--ease); }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @keyframes rise-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .preview-wrap { position: static; } .preview { min-height: 490px; } .preview-content { min-height: 435px; } }
+    @media (max-width: 620px) {
+      body { font-size: 15px; }
+      .app { width: 100%; padding: 0 12px 28px; }
+      .masthead { position: sticky; z-index: 3; top: 0; align-items: center; flex-direction: row; min-height: 66px; padding: 12px 0; background: linear-gradient(var(--page) 80%, transparent); }
+      .brand-mark { width: 36px; height: 36px; border-radius: 11px; font-size: 17px; }
+      .brand { gap: 10px; }
+      .eyebrow { font-size: 9px; }
+      h1 { font-size: 16px; }
+      .status { font-size: 10px; white-space: nowrap; }
+      .status span:last-child { display: none; }
+      .layout { display: flex; flex-direction: column; gap: 14px; padding-top: 14px; }
+      .preview-column { order: -1; }
+      .preview-wrap { position: static; }
+      .preview { min-height: 390px; border-radius: 14px; }
+      .preview-header { height: 46px; padding: 0 13px; }
+      .preview-actions { display: flex; align-items: center; gap: 9px; }
+      .preview-hover-toggle { display: inline-flex; align-items: center; min-height: 28px; border: 1px solid color-mix(in srgb, var(--accent-hover) 70%, transparent); border-radius: 7px; padding: 0 8px; color: var(--accent); background: color-mix(in srgb, var(--accent-hover) 12%, transparent); font: inherit; font-size: 10px; font-weight: 750; cursor: pointer; }
+      .preview-hover-toggle[aria-pressed="true"] { color: var(--preview-text); border-color: var(--accent-hover); background: color-mix(in srgb, var(--accent-hover) 42%, transparent); }
+      .preview.hover-preview .channel:not(.active) { color: var(--preview-text); background: color-mix(in srgb, var(--accent-hover) 22%, transparent); }
+      .preview.hover-preview .message { border-radius: 7px; background: color-mix(in srgb, var(--accent-hover) 12%, transparent); }
+      .preview.hover-preview .composer { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-hover) 72%, transparent); }
+      .preview-content { grid-template-columns: 94px minmax(0, 1fr); min-height: 344px; }
+      .sidebar { padding: 11px 4px; }
+      .side-label { padding: 0 6px 7px; font-size: 9px; }
+      .channel { gap: 4px; padding: 7px 6px; font-size: 11px; }
+      .workspace { padding: 16px 12px; }
+      .workspace h3 { font-size: 14px; }
+      .message { grid-template-columns: 27px minmax(0, 1fr); gap: 7px; margin-top: 15px; }
+      .message.mention { margin-inline: -4px; padding: 7px 5px; }
+      .avatar { width: 27px; height: 27px; font-size: 11px; }
+      .message strong, .message p, .composer { font-size: 11px; }
+      .message time { display: none; }
+      .chip { margin-top: 7px; font-size: 10px; }
+      .composer { margin-top: 18px; padding: 9px 10px; }
+      .controls { gap: 14px; }
+      .card { border-radius: 14px; }
+      .card-title { padding: 13px 14px; }
+      .card-title h2 { font-size: 13px; }
+      .card-title span { font-size: 10px; }
+      .card-body { padding: 14px; }
+      .control-grid.colors { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .control-grid { grid-template-columns: 1fr; gap: 10px; }
+      .color-input, input[type="text"], input[type="url"], select { height: 42px; }
+      .color-input input[type="text"] { min-width: 0; padding: 0 7px; font-size: 12px; }
+      input[type="color"] { width: 37px; flex-basis: 37px; }
+      .icon-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .icon-option span { min-height: 44px; font-size: 12px; }
+      .actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .link-import { grid-column: span 2; }
+      .button { min-height: 44px; padding: 0 10px; }
+      .actions .primary { grid-column: span 2; }
+      .hint { font-size: 11px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Controls -->
-    <div class="panel">
-      <div class="title">Theme Studio — Mobile</div>
-      <div class="sub">View-based editor: only shows controls used by the active preview.</div>
-
-      <div class="tabs" id="tabs">
-        <div class="tab active" data-view="chat">Chat</div>
-        <div class="tab" data-view="users">Users</div>
-        <div class="tab" data-view="channels">Channels</div>
-        <div class="tab" data-view="settings">Settings</div>
-      </div>
-
-      <div class="toolbar">
-        <label class="toggle"><input type="checkbox" id="hoverMode"> Hover mode</label>
-        <label class="toggle"><input type="checkbox" id="showAll"> Show all controls</label>
-        <button id="presetPurple" class="primary">Purple Vision</button>
-        <button id="presetBlue">Cobalt Vision</button>
-        <button id="presetDefault" class="ghost">Default Dark</button>
-      </div>
-
-      <div id="controls"></div>
-
-      <div class="section">
-        <h2>Import / Export</h2>
-        <div class="btns">
-          <button id="import" class="ghost">Import JSON</button>
-          <button id="copy" class="primary">Copy JSON</button>
-          <button id="download">Download JSON</button>
-          <button id="open" class="ghost">Open JSON</button>
-        </div>
-        <textarea id="jsonOut" readonly></textarea>
-        <div class="sub">Host on GitHub and use the <b>raw.githubusercontent.com</b> link in Themes+. Bump <code>"version"</code> then Refetch.</div>
-      </div>
-    </div>
-
-    <!-- Preview -->
-    <div class="previewWrap">
-      <div class="phone">
-        <div class="status"></div>
-        <div class="frame">
-          <div class="views anim">
-            <!-- CHAT -->
-            <div class="view active" data-view="chat">
-              <!-- Left rail -->
-              <div class="rail">
-                <div class="server" title="Server A">A</div>
-                <div class="server" title="Add">+</div>
-                <div class="server" title="Server B">B</div>
-              </div>
-
-              <!-- Chat column -->
-              <div class="chatArea">
-                <!-- topbar -->
-                <div class="chatTopbar">
-                  <div class="chatChan"># general</div>
-                  <div class="chatActions">
-                    <div class="iconBtn" title="Search">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.471 6.471 0 001.48-4.23C15.91 6.01 13.4 3.5 10.45 3.5S5 6.01 5 9s2.51 5.5 5.45 5.5c1.61 0 3.09-.59 4.23-1.48l.27.28v.79L20 20.49 21.49 19 15.5 14zM10.45 13C8.3 13 6.59 11.29 6.59 9.14S8.3 5.27 10.45 5.27s3.86 1.71 3.86 3.86S12.6 13 10.45 13z"/></svg>
-                    </div>
-                    <div class="iconBtn" title="Members">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    </div>
-                    <div class="iconBtn" title="More">
-                      <svg class="icon" viewBox="0 0 24 24"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- messages -->
-                <div class="chatScroll">
-                  <!-- DemoUser -->
-                  <div class="msgGroup">
-                    <div class="msgAvatar"></div>
-                    <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">DemoUser</span>
-                        <span class="msgTime">Today at 12:31</span>
-                      </div>
-                      <div class="msgLine">Hey, this is the first message!</div>
-                      <div class="msgLine">Here’s another line right after it.</div>
-                    </div>
-                  </div>
-
-                  <!-- AnotherUser -->
-                  <div class="msgGroup">
-                    <div class="msgAvatar"></div>
-                    <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">AnotherUser</span>
-                        <span class="msgTime">Today at 12:32</span>
-                      </div>
-                      <div class="msgLine">Hello there <span class="mention">@DemoUser</span>, check this out:</div>
-                      <div class="msgLine"><a class="link" href="https://discord.gg/example" target="_blank" rel="noreferrer">https://discord.gg/example</a></div>
-                    </div>
-                  </div>
-
-                  <!-- AnotherUser follow-up -->
-                  <div class="msgGroup follow">
-                    <div class="msgAvatar"></div>
-                    <div class="msgBlock">
-                      <div class="msgLine">One more line to show stacked messages.</div>
-                    </div>
-                  </div>
-
-                  <!-- BotUser + Embed -->
-                  <div class="msgGroup">
-                    <div class="msgAvatar"></div>
-                    <div class="msgBlock">
-                      <div class="msgHeader">
-                        <span class="msgName">BotUser</span>
-                        <span class="msgTime">Today at 12:33</span>
-                      </div>
-                      <div class="msgLine">Here’s an embed preview:</div>
-                      <div class="embed">
-                        <div class="accent"></div>
-                        <div class="body">
-                          <div class="title">Example Embed</div>
-                          <div class="desc">This embed adopts your theme’s background + brand color.</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- input -->
-                <div class="inputbar">
-                  <div class="inputIcon" title="Attach">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M17.5 6.5l-7.09 7.09a2.5 2.5 0 01-3.54-3.54l7.79-7.79a4.5 4.5 0 116.36 6.36l-8.49 8.49a6.5 6.5 0 11-9.19-9.19l7.79-7.79"/></svg>
-                  </div>
-                  <input placeholder="Message #general" />
-                  <div class="inputIcon" title="Emoji">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm-3 7a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 019 9zm9 3a6 6 0 11-6-6 6 6 0 016 6zm-3 3a4 4 0 01-8 0z"/></svg>
-                  </div>
-                  <button class="send" title="Send">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z" /></svg>
-                  </button>
-                </div>
-
-                <!-- bottom nav -->
-                <div class="nav">
-                  <div class="navBtn active"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9H6v-9H3z"/></svg>Home</div>
-                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zM8 11c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zM16 13c-.29 0-.62.02-.97.05 1.16.84 1.97 1.92 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Friends</div>
-                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4zm0-6a2 2 0 012 2v2a2 2 0 01-4 0V4a2 2 0 012-2zM4 12a2 2 0 012-2h2a2 2 0 010 4H6a2 2 0 01-2-2zm12 6a2 2 0 012-2h2a2 2 0 010 4h-2a2 2 0 01-2-2zM4 20a2 2 0 012-2h2a2 2 0 010 4H6a2 2 0 01-2-2z"/></svg>Activity</div>
-                  <div class="navBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg>Settings</div>
-                </div>
-              </div>
+  <main class="app">
+    <header class="masthead">
+      <div class="brand"><div class="brand-mark">☾</div><div><p class="eyebrow">Kettu theme studio</p><h1 id="editorThemeName">Nightshade</h1></div></div>
+      <div class="status"><span class="status-dot"></span><span id="statusText">Loading theme…</span></div>
+    </header>
+    <section class="layout">
+      <div class="controls">
+        <section class="card">
+          <div class="card-title"><h2>Theme details</h2><span>Included in exported JSON</span></div>
+          <div class="card-body"><div class="control-grid">
+            <label>Theme name<input id="themeName" type="text" maxlength="80" placeholder="Nightshade"></label>
+            <label>Version<input id="themeVersion" type="text" maxlength="40" placeholder="3"></label>
+            <label class="wide">Description<input id="themeDescription" type="text" maxlength="180" placeholder="Clean, midnight-purple aesthetic"></label>
+            <label>Author name<input id="authorName" type="text" maxlength="80" placeholder="Theme author"></label>
+            <label>Author ID<input id="authorId" type="text" maxlength="40" inputmode="numeric" placeholder="000000000000000000"></label>
+          </div></div>
+        </section>
+        <section class="card">
+          <div class="card-title"><h2>Theme mode</h2><span>Apply a complete color preset</span></div>
+          <div class="card-body"><div class="mode-switch"><button class="button" data-mode="dark" aria-pressed="true">Original dark</button><button class="button" data-mode="light" aria-pressed="false">Light purple</button></div></div>
+        </section>
+        <section class="card">
+          <div class="card-title"><h2>Color system</h2><span>Hex values are the source of truth</span></div>
+          <div class="card-body"><div class="control-grid colors">
+            <label>Accent<div class="color-input"><input type="color" data-swatch="accent"><input type="text" value="#8200C8" maxlength="7" spellcheck="false" data-hex="accent"></div></label>
+            <label>Accent hover<div class="color-input"><input type="color" data-swatch="hover"><input type="text" value="#3D007A" maxlength="7" spellcheck="false" data-hex="hover"></div></label>
+            <label>Channel text<div class="color-input"><input type="color" data-swatch="channel"><input type="text" value="#D359FF" maxlength="7" spellcheck="false" data-hex="channel"></div></label>
+            <label>Base background<div class="color-input"><input type="color" data-swatch="base"><input type="text" value="#0F0F10" maxlength="7" spellcheck="false" data-hex="base"></div></label>
+            <label>Raised surface<div class="color-input"><input type="color" data-swatch="surface"><input type="text" value="#121214" maxlength="7" spellcheck="false" data-hex="surface"></div></label>
+            <label>Message text<div class="color-input"><input type="color" data-swatch="text"><input type="text" value="#E9D9FF" maxlength="7" spellcheck="false" data-hex="text"></div></label>
+          </div></div>
+        </section>
+        <section class="card">
+          <div class="card-title"><h2>Background</h2><span>Optional image overlay</span></div>
+          <div class="card-body">
+            <label class="toggle-row"><span>Enable background</span><input id="backgroundEnabled" type="checkbox" checked><span class="toggle" aria-hidden="true"></span></label>
+            <div class="background-settings" id="backgroundControls">
+            <label class="wide">Image URL<input id="backgroundUrl" type="text" placeholder="https://cdn.discordapp.com/attachments/1029064811495030907/1521967680385454133/0ace3486db6ea20ea649e7bb42d1bbe5.jpg?ex=6ac0b51b&is=6abf639b&hm=afb6fa3025284b27ace73d24fc5d2b8cbf14a9aa38b586c60a5abcfb2376a3c6&" spellcheck="false"></label>
+            <label class="wide"><span class="range-line">Image visibility <output id="alphaOutput">0%</output></span><input id="backgroundAlpha" type="range" min="0" max="100" value="0"></label>
+            <div class="control-grid">
+              <label>Fit<select id="backgroundSize"><option value="cover">Cover</option><option value="contain">Contain</option><option value="auto">Original size</option></select></label>
+              <label>Position<select id="backgroundPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option><option value="left">Left</option><option value="right">Right</option></select></label>
             </div>
-
-            <!-- USERS -->
-            <div class="view" data-view="users">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
-              <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Members</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 8a4 4 0 104 4 4 4 0 00-4-4z"/></svg></div></div>
-                </div>
-
-                <!-- Themes+ info row -->
-                <div class="row themesplus-bar">
-                  <div class="ava ava-overlay"></div>
-                  <div>
-                    <div class="name">Icon Pack: <span id="packName">rosiecord-plumpy</span></div>
-                    <div class="subtxt">Overlays: <span id="overlayState">enabled</span> • Mention → <span class="mention">@you</span></div>
-                  </div>
-                  <button class="pill" id="showToastBtn" type="button">Toast</button>
-                </div>
-
-                <div class="row"><div class="ava"></div><div><div class="name">Member One</div><div class="subtxt">Online • @Role</div></div><div class="pill">MOD</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Member Two</div><div class="subtxt">Idle • @Role</div></div><div class="pill">VIP</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Member Three</div><div class="subtxt">Offline • @Role</div></div><div class="pill">GUEST</div></div>
-              </div>
+            <p class="hint">Higher visibility reveals more of the image in both the preview and exported Kettu theme.</p>
             </div>
-
-            <!-- CHANNELS -->
-            <div class="view" data-view="channels">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
-              <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Channels</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M15 3H9v4H5v6h4v4h6v-4h4V7h-4z"/></svg></div></div>
-                </div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">general</div><div class="subtxt">Category • Server</div></div><div class="pill">NEW</div></div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">random</div><div class="subtxt">Category • Server</div></div><div class="pill">5</div></div>
-                <div class="row chanRow"><div class="hash">#</div><div><div class="name">media</div><div class="subtxt">Category • Server</div></div><div class="pill">•</div></div>
-              </div>
-            </div>
-
-            <!-- SETTINGS -->
-            <div class="view" data-view="settings">
-              <div class="rail">
-                <div class="server">A</div><div class="server">+</div><div class="server">B</div>
-              </div>
-              <div class="scroll">
-                <div class="topbar">
-                  <div class="titlebar">Settings</div>
-                  <div class="icons"><div class="iconBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M19.14 12.94a7 7 0 00.06-1l2.11-1.65a.5.5 0 00.12-.64l-2-3.46a.5.5 0 00-.6-.22l-2.49 1a7.14 7.14 0 00-1.73-1l-.38-2.65A.5.5 0 0013.7 2h-3.4a.5.5 0 00-.5.43l-.38 2.65a7.14 7.14 0 00-1.73 1l-2.49-1a.5.5 0 00-.6.22l-2 3.46a.5.5 0 00.12.64L4.8 11a7 7 0 000 2l-2.11 1.65a.5.5 0 00-.12.64l2 3.46a.5.5 0 00.6.22l2.49-1a7.14 7.14 0 001.73 1l.38 2.65a.5.5 0 00.5.43h3.4a.5.5 0 00.5-.43l.38-2.65a7.14 7.14 0 001.73-1l2.49 1a.5.5 0 00.6-.22l2-3.46a.5.5 0 00-.12-.64zM12 15.5A3.5 3.5 0 1115.5 12 3.5 3.5 0 0112 15.5z"/></svg></div></div>
-                </div>
-                <div class="row"><div class="ava"></div><div><div class="name">Cards</div><div class="subtxt">Floating, borders</div></div><div class="pill">UI</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Buttons</div><div class="subtxt">Brand, hover</div></div><div class="pill">OK</div></div>
-                <div class="row"><div class="ava"></div><div><div class="name">Scrollbars</div><div class="subtxt">Thin / auto thumb</div></div><div class="pill">FX</div></div>
-              </div>
-            </div>
-
-          </div><!-- /views -->
-        </div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-title"><h2>Icon pack</h2><span>One active pack</span></div>
+          <div class="card-body"><div class="icon-list" id="iconPacks"></div></div>
+        </section>
+        <section class="card">
+          <div class="card-title"><h2>Import/Export</h2><span>Theme JSON stays compatible</span></div>
+          <div class="card-body"><div class="actions"><button class="button" id="importButton">Import JSON</button><button class="button primary" id="downloadButton">Download JSON</button><button class="button" id="copyButton">Copy JSON</button><button class="button ghost" id="resetButton">Reset</button><input class="visually-hidden" id="importInput" type="file" accept="application/json,.json"><div class="link-import"><input id="importUrl" type="url" placeholder="https://example.com/theme.json" spellcheck="false"><button class="button" id="importUrlButton">Import link</button></div></div></div>
+        </section>
       </div>
-    </div>
-  </div>
-
-<script>
-/* ============== Presets ============== */
-const PRESETS = {
-  purple:{
-    meta:{name:"Purple Vision (Alpha Mobile)",desc:"Crisp purple accents on a deep dark UI.",version:"3",author:{name:"Your Name",id:"000000000000000000"}},
-    palette:{brand:"#8200c8",brandHover:"#3d007a",link:"#8200c8",
-      text:"#cbadff",muted:"#d359ff",textPrimary:"#e9d9ff",textSecond:"#d79dff",
-      bgPrimary:"#0f0f10",bgSecondary:"#121214",bgAlt:"#101012",bgTertiary:"#0c0c0e",bgFloating:"#0f0f12",bgNested:"#0e0e10",
-      cardPrimary:"#0e0e10",cardSecondary:"#0f0f12",input:"#121214",
-      success:"#43b581",warning:"#faa61a",danger:"#7f007b",ripple:"#5b2a82",scrollbar:"#2b2b2b",mentionLine:"#b592e6"},
-    plus:{iconPack:"rosiecord-plumpy",customOverlays:true}
-  },
-  cobalt:{
-    meta:{name:"Cobalt Vision (Alpha Mobile)",desc:"Azure/cobalt accents, dark everything.",version:"3",author:{name:"Your Name",id:"000000000000000000"}},
-    palette:{brand:"#2ea8ff",brandHover:"#166dce",link:"#2ea8ff",
-      text:"#d6e8ff",muted:"#a8c6ff",textPrimary:"#e7f1ff",textSecond:"#b9d4ff",
-      bgPrimary:"#0f0f10",bgSecondary:"#121214",bgAlt:"#101012",bgTertiary:"#0c0c0e",bgFloating:"#0f0f12",bgNested:"#0e0e10",
-      cardPrimary:"#0e0e10",cardSecondary:"#0f0f12",input:"#121214",
-      success:"#43b581",warning:"#f5b14d",danger:"#e04f5f",ripple:"#2a5d9c",scrollbar:"#2b2b2b",mentionLine:"#8ecbff"},
-    plus:{iconPack:"rosiecord-plumpy",customOverlays:true}
-  },
-  default:{
-    meta:{name:"Default Dark",desc:"Safe starter preset.",version:"1",author:{name:"Your Name",id:"000000000000000000"}},
-    palette:{brand:"#5865f2",brandHover:"#4450d8",link:"#5865f2",
-      text:"#e6e6e6",muted:"#aaaaaa",textPrimary:"#ffffff",textSecond:"#cfcfcf",
-      bgPrimary:"#2b2d31",bgSecondary:"#232428",bgAlt:"#1e1f22",bgTertiary:"#1a1b1e",bgFloating:"#2b2d31",bgNested:"#1e1f22",
-      cardPrimary:"#1e1f22",cardSecondary:"#2b2d31",input:"#1e1f22",
-      success:"#3ba55d",warning:"#faa61a",danger:"#ed4245",ripple:"#3a3d43",scrollbar:"#3a3d43",mentionLine:"#7aa0ff"},
-    plus:{iconPack:"default",customOverlays:false}
-  }
-};
-
-/* ============== Field sets by view (context-aware) ============== */
-const FIELDS = {
-  meta:[
-    {id:'name', label:'Name', type:'text', group:'Meta'},
-    {id:'desc', label:'Description', type:'text', group:'Meta'},
-    {id:'ver',  label:'Version', type:'text', group:'Meta'},
-    {id:'authN',label:'Author Name', type:'text', group:'Meta'},
-    {id:'authI',label:'Author ID', type:'text', group:'Meta'},
-  ],
-  plus:[
-    {id:'iconPack', label:'Themes+ Icon Pack', type:'select', options:['rosiecord-plumpy','oneko-plumpy','default'], group:'Themes+'},
-    {id:'mentionLineColor', label:'Mention Line', type:'color', group:'Themes+'},
-    {id:'customOverlays', label:'Custom Overlays', type:'checkbox', group:'Themes+'},
-  ],
-  chat:[
-    {id:'brand',label:'Brand',type:'color',hint:'Buttons, accents'},
-    {id:'brandHover',label:'Brand (hover)',type:'color'},
-    {id:'link',label:'Link',type:'color'},
-    {id:'text',label:'Text (normal)',type:'color'},
-    {id:'muted',label:'Text (muted)',type:'color'},
-    {id:'textPrimary',label:'Text (primary)',type:'color'},
-    {id:'textSecond',label:'Text (secondary)',type:'color'},
-    {id:'bgPrimary',label:'Chat background',type:'color'},
-    {id:'bgFloating',label:'Header',type:'color'},
-    {id:'cardPrimary',label:'Message bubble',type:'color'},
-    {id:'input',label:'Input background',type:'color'},
-    {id:'bgAlt',label:'Active row/card',type:'color'},
-    {id:'mentionLineColor',label:'Mention line',type:'color'},
-  ],
-  users:[
-    {id:'textPrimary',label:'Name text',type:'color'},
-    {id:'muted',label:'Role / status text',type:'color'},
-    {id:'bgPrimary',label:'List background',type:'color'},
-    {id:'bgAlt',label:'Member card',type:'color'},
-    {id:'bgFloating',label:'Header',type:'color'},
-    {id:'brand',label:'Badges / accents',type:'color'},
-  ],
-  channels:[
-    {id:'textSecond',label:'Channel text',type:'color'},
-    {id:'muted',label:'Category / meta',type:'color'},
-    {id:'bgPrimary',label:'List background',type:'color'},
-    {id:'bgAlt',label:'Channel row',type:'color'},
-    {id:'bgFloating',label:'Header',type:'color'},
-    {id:'brand',label:'Selected / accent',type:'color'},
-  ],
-  settings:[
-    {id:'cardSecondary',label:'Card secondary',type:'color'},
-    {id:'bgAlt',label:'Card base',type:'color'},
-    {id:'bgSecondary',label:'Panel/nav',type:'color'},
-    {id:'scrollbar',label:'Scrollbar thumb',type:'color'},
-    {id:'success',label:'Success',type:'color'},
-    {id:'warning',label:'Warning',type:'color'},
-    {id:'danger',label:'Danger',type:'color'},
-    {id:'ripple',label:'Android ripple',type:'color'},
-  ],
-};
-
-/* ============== DOM helpers & state ============== */
-const $ = (s,root=document)=>root.querySelector(s);
-const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
-const root = document.documentElement;
-const setVar = (k,v)=>root.style.setProperty('--'+k,v);
-const A = v => [v];
-
-let activeView = 'chat';
-let showAll = false;
-let state = JSON.parse(JSON.stringify(PRESETS.purple)); // deep clone
-
-/* ============== Controls rendering ============== */
-const controls = document.getElementById('controls');
-
-function fieldHTML(f){
-  const right = f.type==='select'
-    ? `<select id="${f.id}">${(f.options||[]).map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`
-    : f.type==='checkbox'
-      ? `<label style="display:flex;gap:8px;align-items:center"><input id="${f.id}" type="checkbox"> enabled</label>`
-      : `<input id="${f.id}" type="${f.type}" ${f.type==='color'?'value="#000000"':''}>`;
-  return `
-  <div class="field" data-key="${f.id}">
-    <div class="left">
-      <label for="${f.id}">${f.label}</label>
-      ${f.hint?`<div class="hint">${f.hint}</div>`:''}
-    </div>
-    ${right}
-  </div>`;
-}
-
-function groupHTML(title, items){ return `<div class="section"><h2>${title}</h2><div class="fields">${items.map(fieldHTML).join('')}</div></div>`; }
-
-function renderControls(){
-  const blocks = [];
-  if(showAll || activeView==='chat') blocks.push(groupHTML('Meta', FIELDS.meta));
-  blocks.push(groupHTML('Colors', FIELDS[activeView]||[]));
-  if(activeView==='users' || showAll) blocks.push(groupHTML('Themes+ Options', FIELDS.plus));
-  controls.innerHTML = blocks.join('');
-  wireInputs();
-  populateFromState();
-}
-
-/* ============== Apply/populate ============== */
-function applyPalette(p){
-  Object.entries(p).forEach(([k,v])=>{
-    setVar(k,v);
-    const el = document.getElementById(k);
-    if(el){
-      if(el.type==='color' || el.type==='text') el.value = v;
-      if(el.tagName==='SELECT') el.value = v;
-    }
-  });
-  const ml = document.getElementById('mentionLineColor');
-  if(ml) ml.value = p.mentionLine || '#8ecbff';
-  // defensive defaults for icon tints
-  root.style.setProperty('--icon', p.text || '#e6e6e6');
-  root.style.setProperty('--iconMuted', '#8a8a8a');
-}
-
-function updateThemesPlusIndicators(){
-  const pack = state.plus?.iconPack || 'default';
-  const overlays = !!state.plus?.customOverlays;
-  const nameEl = document.getElementById('packName');
-  const ovEl = document.getElementById('overlayState');
-  if (nameEl) nameEl.textContent = pack;
-  if (ovEl) ovEl.textContent = overlays ? 'enabled' : 'disabled';
-}
-
-function populateFromState(){
-  const m = state.meta;
-  const setV = (id,val)=>{ const el=document.getElementById(id); if(el) el.value = val??''; };
-  setV('name',m.name); setV('desc',m.desc); setV('ver',m.version);
-  setV('authN',m.author?.name||''); setV('authI',m.author?.id||'');
-  // plus
-  const ip = document.getElementById('iconPack'); if(ip) ip.value = state.plus?.iconPack || 'default';
-  const co = document.getElementById('customOverlays'); if(co) co.checked = !!state.plus?.customOverlays;
-  const ml = document.getElementById('mentionLineColor'); if(ml) ml.value = state.palette.mentionLine || '#8ecbff';
-  // palette
-  applyPalette(state.palette);
-  updateThemesPlusIndicators();
-  buildJSON();
-}
-
-function setPreset(key){ state = JSON.parse(JSON.stringify(PRESETS[key])); applyPalette(state.palette); renderControls(); buildJSON(); }
-
-/* ============== Inputs ============== */
-function wireInputs(){
-  // meta
-  ['name','desc','ver','authN','authI'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.oninput = ()=>{
-      if(id==='name') state.meta.name = el.value;
-      else if(id==='desc') state.meta.desc = el.value;
-      else if(id==='ver') state.meta.version = el.value;
-      else if(id==='authN') state.meta.author.name = el.value;
-      else if(id==='authI') state.meta.author.id = el.value;
-      buildJSON();
+      <aside class="preview-column"><div class="preview-wrap"><section class="preview" aria-label="Live Nightshade preview">
+        <div class="preview-header"><div class="preview-brand"><i></i><span id="previewThemeName">Nightshade</span></div><div class="preview-actions"><button class="preview-hover-toggle" id="previewHoverToggle" type="button" aria-pressed="false">Hover preview</button><span aria-hidden="true">•••</span></div></div>
+        <div class="preview-content" id="previewContent"><nav class="sidebar"><div class="side-label">Channels</div><div class="channel active"><b>#</b>general</div><div class="channel"><b>#</b>night-talk</div><div class="channel"><b>#</b>customize</div></nav><div class="workspace"><h3># general</h3><p class="topic" id="previewThemeDescription">A clean midnight-purple theme.</p><div class="message"><div class="avatar">N</div><div><strong id="previewAuthorName">Nightshade</strong><time>Today at 20:24</time><p>The updated theme is ready to preview.</p><span class="chip">#8200C8 accent</span></div></div><div class="message"><div class="avatar">Y</div><div><strong>You</strong><time>Today at 20:25</time><p>Message text preview — this colour updates live.</p></div></div><div class="composer">Message #general <span>＋</span></div></div></div>
+      </section></div></aside>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const iconPacks = ["rosiecord-plumpy", "md3", "deco", "solar", "solarduotone", "solarbroken", "materialtwotone", "iconsaxbulk"];
+    const defaultBackground = { url: "https://cdn.discordapp.com/attachments/1029064811495030907/1521967680385454133/0ace3486db6ea20ea649e7bb42d1bbe5.jpg?ex=6ac0b51b&is=6abf639b&hm=afb6fa3025284b27ace73d24fc5d2b8cbf14a9aa38b586c60a5abcfb2376a3c6&", alpha: 0.4, size: "cover", position: "center" };
+    const colorMaps = {
+      accent: { semantic: ["BACKGROUND_ACCENT", "BACKGROUND_BRAND", "MENTION_FOREGROUND", "TEXT_LINK", "INTERACTIVE_ACTIVE"], raw: ["BRAND_200", "BRAND_260", "BRAND_300", "BRAND_330", "BRAND_345", "BRAND_360", "BRAND_400", "BRAND_430", "BRAND_460", "BRAND_500", "BRAND_530", "BRAND_600", "BRAND_630", "BRAND_660", "BRAND_700", "PLUM_3", "PLUM_15", "PRIMARY_300", "PRIMARY_360", "PRIMARY_500", "PRIMARY_530"] },
+      hover: { semantic: ["INTERACTIVE_HOVER"], raw: ["BRAND_560", "PRIMARY_400"] },
+      channel: { semantic: ["CHANNELS_DEFAULT", "CHANNEL_ICON", "HEADER_SECONDARY", "INTERACTIVE_MUTED", "REDESIGN_CHANNEL_CATEGORY_NAME_TEXT", "TEXT_MUTED"], raw: ["PLUM_9", "PLUM_10", "PLUM_11", "PLUM_13", "PRIMARY_730", "ROLE_DEFAULT", "WHITE_630"] },
+      base: { semantic: ["ANDROID_NAVIGATION_SCRIM_BACKGROUND", "CHAT_BACKGROUND", "BACKGROUND_MOBILE_PRIMARY", "BACKGROUND_PRIMARY", "BG_BASE_PRIMARY", "HOME_BACKGROUND", "STATUS_DANGER_TEXT"], raw: ["PLUM_17", "PLUM_20", "PLUM_24", "PLUM_25", "PRIMARY_600", "PRIMARY_DARK_700", "PRIMARY_DARK_800"] },
+      surface: { semantic: ["BACKGROUND_FLOATING", "BACKGROUND_MOBILE_SECONDARY", "BACKGROUND_NESTED_FLOATING", "BACKGROUND_SECONDARY", "BACKGROUND_SECONDARY_ALT", "BACKGROUND_SURFACE_RAISED", "BACKGROUND_TERTIARY", "BG_BASE_SECONDARY", "BG_BASE_TERTIARY", "BG_SURFACE_OVERLAY", "BG_SURFACE_OVERLAY_TMP", "BG_SURFACE_RAISED", "CARD_PRIMARY_BG", "CARD_SECONDARY_BG", "CHANNELTEXTAREA_BACKGROUND", "EMBED_BACKGROUND", "INPUT_BACKGROUND_DEFAULT", "KEYBOARD", "PANEL_BG", "POLLS_NORMAL_FILL_HOVER", "POLLS_NORMAL_IMAGE_BACKGROUND", "REDESIGN_ACTIVITY_CARD_BACKGROUND", "REDESIGN_ACTIVITY_CARD_BACKGROUND_PRESSED", "REDESIGN_BUTTON_SECONDARY_ALT_BACKGROUND", "REDESIGN_BUTTON_SECONDARY_BACKGROUND", "REDESIGN_BUTTON_TERTIARY_BACKGROUND", "REDESIGN_CHAT_INPUT_BACKGROUND"], raw: ["PLUM_16", "PLUM_19", "PLUM_21", "PLUM_22", "PRIMARY_460", "PRIMARY_630", "PRIMARY_660", "PRIMARY_700", "PRIMARY_DARK_600", "PRIMARY_DARK_630", "PRIMARY_DARK_660"] },
+      text: { semantic: ["HEADER_PRIMARY", "INTERACTIVE_NORMAL", "INTERACTIVE_TEXT_DEFAULT", "REDESIGN_CHANNEL_NAME_TEXT", "TEXT_DEFAULT", "TEXT_NORMAL", "TEXT_PRIMARY", "TEXT_STRONG"], raw: ["BRAND_730", "PLUM_1", "PLUM_4", "PLUM_6", "PRIMARY_100", "PRIMARY_200", "PRIMARY_330", "PRIMARY_DARK_200", "WHITE_500"] }
     };
-  });
-  // plus
-  const ip = document.getElementById('iconPack'); if(ip) ip.oninput = ()=>{ state.plus.iconPack = ip.value; updateThemesPlusIndicators(); buildJSON(); };
-  const co = document.getElementById('customOverlays'); if(co) co.oninput = ()=>{ state.plus.customOverlays = co.checked; updateThemesPlusIndicators(); buildJSON(); };
-  const ml = document.getElementById('mentionLineColor'); if(ml) ml.oninput = ()=>{ state.palette.mentionLine = ml.value; setVar('mentionLine', ml.value); buildJSON(); };
-  // colors
-  const ids = ['brand','brandHover','link','text','muted','textPrimary','textSecond','bgPrimary','bgSecondary','bgAlt','bgTertiary','bgFloating','bgNested','cardPrimary','cardSecondary','input','success','warning','danger','ripple','scrollbar'];
-  ids.forEach(k=>{
-    const el = document.getElementById(k);
-    if(!el) return;
-    el.oninput = ()=>{
-      state.palette[k] = el.value;
-      setVar(k, el.value);
-      if(k==='brand' && document.getElementById('link')){ state.palette.link = el.value; setVar('link', el.value); const ln=document.getElementById('link'); if(ln) ln.value=el.value; }
-      buildJSON();
+    const createEmbeddedTheme = () => {
+      const embedded = { name: "Nightshade", description: "Clean, midnight-purple aesthetic", version: "3", authors: [{ name: "Theme author", id: "000000000000000000" }], semanticColors: {}, rawColors: {}, plus: { version: 0, customOverlays: true, iconpack: "rosiecord-plumpy" }, spec: 2, background: { url: "https://cdn.discordapp.com/attachments/1029064811495030907/1555626648580136960/HWAIEX.png?ex=6ac135b7&is=6abfe437&hm=f695def78a12edb9b6001096197419622cd1f5b96f37908de29b864d45d67153&", alpha: 0.4, size: "cover", position: "center" } };
+      const palette = { accent: "#1DAD00", hover: "#0E7A00", channel: "#029400", base: "#080808", surface: "#0D0D0D", text: "#DEFFDB" };
+      Object.entries(palette).forEach(([key, color]) => { colorMaps[key].semantic.forEach(name => embedded.semanticColors[name] = [color]); colorMaps[key].raw.forEach(name => embedded.rawColors[name] = color); });
+      Object.assign(embedded.semanticColors, { ANDROID_RIPPLE: ["#5b2a82"], BACKGROUND_MENTIONED: ["rgba(114,0,0,0.1)"], BACKGROUND_MENTIONED_HOVER: ["rgba(170,0,0,0.1)"], BACKGROUND_MESSAGE_HOVER: ["#FFFFFF0D"], BACKGROUND_MODIFIER_ACCENT: ["#FFFFFF12"], BACKGROUND_MODIFIER_ACTIVE: ["#FFFFFF14"], BACKGROUND_MODIFIER_HOVER: ["#FFFFFF0F"], BACKGROUND_MODIFIER_SELECTED: ["#FFFFFF1A"], BACKGROUND_MODIFIER_ACCEPT: ["#43b58133"], BACKGROUND_MODIFIER_ACCEPT_HOVER: ["#43b5814d"], BACKGROUND_MOD_MUTED: ["#121214"], BG_BACKDROP: ["#000000b2"], BORDER_FAINT: ["#FFFFFF12"], BORDER_SUBTLE: ["#FFFFFF1C"], BORDER_STRONG: ["#FFFFFF26"], MENTION_FOREGROUND: [palette.accent], REDESIGN_BUTTON_DANGER_BACKGROUND: ["#7f007b"], REDESIGN_BUTTON_SECONDARY_BORDER: ["#FFFFFF1A"], SPOILER_HIDDEN_BACKGROUND: ["#000000"], STATUS_DANGER: ["#7f007b"], STATUS_DANGER_BACKGROUND: ["#7f007b"], TEXT_LINK: [palette.accent], TEXT_SECONDARY: ["#d79dff"] });
+      Object.assign(embedded.rawColors, { BLACK_500: "#000000b2", PLUM_18: "#101012", PRIMARY_645: "#101012", PRIMARY_800: "#101012", PRIMARY_DARK_600: palette.surface, PRIMARY_DARK_630: palette.surface, PRIMARY_DARK_660: palette.surface, PRIMARY_DARK_700: palette.base, PRIMARY_DARK_800: palette.base, GREEN_500: "#43b581", RED_500: "#7f007b", ORANGE_500: "#faa61a", YELLOW_500: "#faa61a" });
+      return embedded;
     };
-  });
-}
-
-/* ============== JSON Builder (spec:2 + plus) ============== */
-function buildJSON(){
-  const P = state.palette, meta = state.meta, plus = state.plus||{};
-  const authors = [{name:meta.author.name,id:meta.author.id}].filter(a=>a.name&&a.id);
-
-  const semanticColors = {
-    ANDROID_RIPPLE:A(P.ripple),
-    CHAT_BACKGROUND:A(P.bgPrimary),
-
-    BACKGROUND_ACCENT:A(P.brand),
-    BACKGROUND_FLOATING:A(P.bgFloating),
-    BACKGROUND_MENTIONED:A("rgba(114,0,0,0.1)"),
-    BACKGROUND_MENTIONED_HOVER:A("rgba(170,0,0,0.1)"),
-    BACKGROUND_MESSAGE_HOVER:A("#FFFFFF0D"),
-    BACKGROUND_NESTED_FLOATING:A(P.bgNested),
-    BACKGROUND_MOBILE_PRIMARY:A(P.bgPrimary),
-    BACKGROUND_MOBILE_SECONDARY:A(P.bgSecondary),
-    BACKGROUND_MODIFIER_ACCENT:A("#FFFFFF12"),
-    BACKGROUND_MODIFIER_ACTIVE:A("#FFFFFF14"),
-    BACKGROUND_MODIFIER_HOVER:A("#FFFFFF0F"),
-    BACKGROUND_MODIFIER_SELECTED:A("#FFFFFF1A"),
-    BACKGROUND_PRIMARY:A(P.bgPrimary),
-    BACKGROUND_SECONDARY:A(P.bgSecondary),
-    BACKGROUND_SECONDARY_ALT:A(P.bgAlt),
-    BACKGROUND_TERTIARY:A(P.bgTertiary),
-
-    BG_BASE_PRIMARY:A(P.bgPrimary),
-    BG_BACKDROP:A("#000000b2"),
-    BG_BASE_SECONDARY:A(P.bgSecondary),
-    BG_BASE_TERTIARY:A(P.bgAlt),
-
-    HOME_BACKGROUND:A(P.bgSecondary),
-
-    BORDER_FAINT:A("#FFFFFF12"),
-    BORDER_SUBTLE:A("#FFFFFF1c"),
-    BORDER_STRONG:A("#FFFFFF26"),
-
-    CARD_PRIMARY_BG:A(P.cardPrimary),
-    CARD_SECONDARY_BG:A(P.cardSecondary),
-    CHANNELS_DEFAULT:A(P.muted),
-    CHANNEL_ICON:A(P.muted),
-    CHANNELTEXTAREA_BACKGROUND:A(P.input),
-
-    EMBED_BACKGROUND:A(P.bgFloating),
-
-    HEADER_PRIMARY:A(P.text),
-    HEADER_SECONDARY:A(P.muted),
-
-    INTERACTIVE_ACTIVE:A(P.brand),
-    INTERACTIVE_HOVER:A(P.brandHover),
-    INTERACTIVE_MUTED:A(P.muted),
-    INTERACTIVE_NORMAL:A(P.text),
-
-    MENTION_BACKGROUND:A("rgba(114,0,0,0.1)"),
-    MENTION_FOREGROUND:A(P.brand),
-
-    REDESIGN_ACTIVITY_CARD_BACKGROUND:A(P.bgAlt),
-    REDESIGN_ACTIVITY_CARD_BACKGROUND_PRESSED:A(P.bgSecondary),
-    REDESIGN_BUTTON_SECONDARY_ALT_BACKGROUND:A(P.bgAlt),
-    REDESIGN_BUTTON_SECONDARY_BACKGROUND:A(P.bgAlt),
-    REDESIGN_BUTTON_SECONDARY_BORDER:A("#FFFFFF1A"),
-    REDESIGN_BUTTON_DANGER_BACKGROUND:A(P.danger),
-    REDESIGN_CHANNEL_CATEGORY_NAME_TEXT:A(P.muted),
-    REDESIGN_CHANNEL_NAME_TEXT:A(P.text),
-    REDESIGN_CHAT_INPUT_BACKGROUND:A(P.input),
-
-    SPOILER_HIDDEN_BACKGROUND:A("#000000"),
-
-    STATUS_DANGER:A(P.danger),
-    STATUS_DANGER_BACKGROUND:A(P.danger),
-    STATUS_DANGER_TEXT:A(P.bgPrimary),
-
-    POLLS_NORMAL_FILL_HOVER:A(P.bgSecondary),
-    POLLS_NORMAL_IMAGE_BACKGROUND:A(P.bgSecondary),
-    POLLS_VICTOR_FILL:A(P.success + "80"),
-
-    TEXT_LINK:A(P.link),
-    TEXT_MUTED:A(P.muted),
-    TEXT_NORMAL:A(P.text),
-    TEXT_PRIMARY:A(P.textPrimary),
-    TEXT_SECONDARY:A(P.textSecond),
-
-    BG_MOD_FAINT:A("#FFFFFF12"),
-    KEYBOARD:A(P.bgAlt),
-    BACKGROUND_MODIFIER_ACCEPT:A(P.success + "33"),
-    BACKGROUND_MODIFIER_ACCEPT_HOVER:A(P.success + "4d"),
-    AUTOMOD_QUEUED_FOR_REVIEW_BACKGROUND:A(P.warning + "33"),
-    AUTOMOD_QUEUED_FOR_REVIEW_BACKGROUND_HOVER:A(P.warning + "4d"),
-
-    SCROLLBAR_AUTO_THUMB:A(P.scrollbar),
-    SCROLLBAR_AUTO_TRACK:A("transparent"),
-    SCROLLBAR_THIN_THUMB:A(P.scrollbar),
-    SCROLLBAR_THIN_TRACK:A("transparent")
-  };
-
-  const rawColors = {
-    BLUE_260:"#5a76a8",BLUE_300:"#5a76a8",BLUE_330:"#5a76a8",BLUE_345:"#5a76a8",BLUE_360:"#5a76a8",BLUE_400:"#5a76a8",BLUE_430:"#5a76a8",BLUE_460:"#5a76a8",BLUE_500:"#5a76a8",BLUE_530:"#5a76a8",BLUE_560:"#5a76a8",BLUE_600:"#5a76a8",BLUE_630:"#5a76a8",BLUE_660:"#5a76a8",BLUE_700:"#5a76a8",
-    BLACK_500:"#000000b2",
-
-    BRAND_200:P.brand,BRAND_260:P.brand,BRAND_300:P.brand,BRAND_330:P.brand,BRAND_345:P.brand,BRAND_360:P.brand,BRAND_400:P.brand,BRAND_430:P.brand,
-    BRAND_460:P.brand,BRAND_500:P.brand,BRAND_530:P.brand,BRAND_560:P.brandHover,BRAND_600:P.brand,BRAND_630:P.brand,BRAND_660:P.brand,BRAND_700:P.brand,BRAND_730:P.text,
-
-    PLUM_1:P.text,PLUM_3:P.brand,PLUM_4:P.text,PLUM_6:P.text,PLUM_9:P.muted,PLUM_10:P.muted,PLUM_11:P.muted,PLUM_13:P.muted,
-    PLUM_15:P.brand,PLUM_16:P.bgSecondary,PLUM_17:P.bgPrimary,PLUM_18:P.bgAlt,PLUM_19:P.bgSecondary,PLUM_20:P.bgPrimary,PLUM_21:P.bgSecondary,PLUM_22:P.bgSecondary,PLUM_24:P.bgPrimary,PLUM_25:P.bgPrimary,
-
-    PRIMARY_100:P.muted,PRIMARY_200:P.text,PRIMARY_300:P.brand,PRIMARY_330:P.text,PRIMARY_360:P.brand,PRIMARY_400:P.brandHover,
-    PRIMARY_460:P.bgSecondary,PRIMARY_500:P.brand,PRIMARY_530:P.brand,PRIMARY_600:P.bgPrimary,PRIMARY_630:P.bgSecondary,
-    PRIMARY_645:P.bgAlt,PRIMARY_660:P.bgSecondary,PRIMARY_700:P.bgTertiary,PRIMARY_730:P.muted,PRIMARY_800:P.cardSecondary,
-
-    GREEN_260:P.success,GREEN_300:P.success,GREEN_330:P.success,GREEN_345:P.success,GREEN_360:P.success,GREEN_400:P.success,GREEN_430:P.success,GREEN_460:P.success,GREEN_500:P.success,GREEN_530:P.success,GREEN_560:P.success,GREEN_600:P.success,GREEN_630:P.success,GREEN_660:P.success,GREEN_700:P.success,
-
-    GUILD_BOOSTING_PINK:P.brand,GUILD_BOOSTING_PURPLE:P.brand,GUILD_BOOSTING_PURPLE_FOR_GRADIENTS:P.brand,
-
-    RED_260:P.danger,RED_300:P.danger,RED_330:P.danger,RED_345:P.danger,RED_360:P.danger,RED_400:P.danger,RED_430:P.danger,RED_460:P.danger,RED_500:P.danger,RED_530:P.danger,RED_560:P.danger,RED_600:P.danger,RED_630:P.danger,RED_660:P.danger,RED_700:P.danger,
-
-    ORANGE_260:P.warning,ORANGE_300:P.warning,ORANGE_330:P.warning,ORANGE_345:P.warning,ORANGE_360:P.warning,ORANGE_400:P.warning,ORANGE_430:P.warning,ORANGE_460:P.warning,ORANGE_500:P.warning,ORANGE_530:P.warning,ORANGE_560:P.warning,ORANGE_600:P.warning,ORANGE_630:P.warning,ORANGE_660:P.warning,ORANGE_700:P.warning,
-
-    YELLOW_260:P.warning,YELLOW_300:P.warning,YELLOW_330:P.warning,YELLOW_345:P.warning,YELLOW_360:P.warning,YELLOW_400:P.warning,YELLOW_430:P.warning,YELLOW_460:P.warning,YELLOW_500:P.warning,YELLOW_530:P.warning,YELLOW_560:P.warning,YELLOW_600:P.warning,YELLOW_630:P.warning,YELLOW_660:P.warning,YELLOW_700:P.warning,
-
-    WHITE_500:P.text,WHITE_630:P.muted,ROLE_DEFAULT:P.muted
-  };
-
-  const obj = {
-    name: meta.name, description: meta.desc, version: meta.version,
-    authors: authors.length?authors:[{name:"Author",id:"000000000000000000"}],
-    semanticColors, rawColors,
-    plus: {version:"0", iconPack:plus.iconPack||'default', mentionLineColor:P.mentionLine, customOverlays:!!plus.customOverlays},
-    spec:2
-  };
-  document.getElementById('jsonOut').value = JSON.stringify(obj,null,2);
-  return obj;
-}
-
-/* ============== Tabs / toggles / presets / import-export ============== */
-document.getElementById('tabs').addEventListener('click', e=>{
-  const t = e.target.closest('.tab'); if(!t) return;
-  const view = t.dataset.view; if(!view) return;
-  $$('.tab',tabs).forEach(el=>el.classList.toggle('active', el===t));
-  const container = document.querySelector('.views'); container.classList.add('anim');
-  $$('.view').forEach(v=>v.classList.toggle('active', v.dataset.view===view));
-  activeView = view;
-  renderControls();
-});
-
-document.getElementById('hoverMode').addEventListener('change', e=>{
-  const on = e.target.checked;
-  const frame = document.querySelector('.phone .frame');
-  frame.classList.toggle('hovering', on);
-});
-
-document.getElementById('showAll').addEventListener('change', e=>{
-  showAll = e.target.checked;
-  renderControls();
-});
-
-document.getElementById('presetPurple').onclick=()=>setPreset('purple');
-document.getElementById('presetBlue').onclick=()=>setPreset('cobalt');
-document.getElementById('presetDefault').onclick=()=>setPreset('default');
-
-document.getElementById('import').onclick=()=>{
-  const input=document.createElement('input'); input.type='file'; input.accept='.json,application/json';
-  input.onchange=e=>{
-    const f=e.target.files[0]; if(!f) return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      try{
-        const data=JSON.parse(ev.target.result);
-        state.meta.name = data.name || state.meta.name;
-        state.meta.desc = data.description || state.meta.desc;
-        state.meta.version = data.version || state.meta.version;
-        if(Array.isArray(data.authors)&&data.authors[0]) state.meta.author = {name:data.authors[0].name||'', id:data.authors[0].id||''};
-        state.plus = state.plus || {};
-        if(data.plus){
-          if(data.plus.iconPack) state.plus.iconPack = data.plus.iconPack;
-          if(typeof data.plus.customOverlays==='boolean') state.plus.customOverlays = data.plus.customOverlays;
-          if(data.plus.mentionLineColor) state.palette.mentionLine = data.plus.mentionLineColor;
-        }
-        // best-effort palette mapping from semanticColors
-        const sc=data.semanticColors||{}; const pick=k=>Array.isArray(sc[k])?sc[k][0]:null;
-        const map={brand:'TEXT_LINK', text:'TEXT_NORMAL', muted:'TEXT_MUTED', textPrimary:'TEXT_PRIMARY', textSecond:'TEXT_SECONDARY',
-          link:'TEXT_LINK', bgPrimary:'BACKGROUND_PRIMARY', bgSecondary:'BACKGROUND_SECONDARY', bgAlt:'BACKGROUND_SECONDARY_ALT',
-          bgTertiary:'BACKGROUND_TERTIARY', bgFloating:'BACKGROUND_FLOATING', bgNested:'BACKGROUND_NESTED_FLOATING',
-          cardPrimary:'CARD_PRIMARY_BG', cardSecondary:'CARD_SECONDARY_BG', input:'CHANNELTEXTAREA_BACKGROUND'};
-        Object.entries(map).forEach(([k,kk])=>{ const v=pick(kk); if(v) state.palette[k]=v; });
-        applyPalette(state.palette);
-        updateThemesPlusIndicators();
-        renderControls();
-        buildJSON();
-      }catch(err){ alert('Invalid JSON'); console.error(err); }
+    let originalTheme = null;
+    let theme = null;
+    let themeMode = "dark";
+    let exportFormat = "legacy";
+    let themeId = null;
+    let themeType = "dark";
+    const selectors = {
+      status: document.querySelector("#statusText"), toast: document.querySelector("#toast"), preview: document.querySelector("#previewContent"), previewHoverToggle: document.querySelector("#previewHoverToggle"), alpha: document.querySelector("#backgroundAlpha"), alphaOutput: document.querySelector("#alphaOutput"), backgroundUrl: document.querySelector("#backgroundUrl"), backgroundEnabled: document.querySelector("#backgroundEnabled"), backgroundControls: document.querySelector("#backgroundControls"), backgroundSize: document.querySelector("#backgroundSize"), backgroundPosition: document.querySelector("#backgroundPosition"), iconPacks: document.querySelector("#iconPacks"), importInput: document.querySelector("#importInput"), importUrl: document.querySelector("#importUrl"), importUrlButton: document.querySelector("#importUrlButton"), themeName: document.querySelector("#themeName"), themeVersion: document.querySelector("#themeVersion"), themeDescription: document.querySelector("#themeDescription"), authorName: document.querySelector("#authorName"), authorId: document.querySelector("#authorId"), editorThemeName: document.querySelector("#editorThemeName"), previewThemeName: document.querySelector("#previewThemeName"), previewThemeDescription: document.querySelector("#previewThemeDescription"), previewAuthorName: document.querySelector("#previewAuthorName")
     };
-    r.readAsText(f);
-  };
-  input.click();
-};
-
-document.getElementById('copy').onclick=()=>{
-  navigator.clipboard.writeText(document.getElementById('jsonOut').value);
-  const btn=document.getElementById('copy'); const old=btn.textContent; btn.textContent='Copied!'; setTimeout(()=>btn.textContent=old,900);
-};
-document.getElementById('download').onclick=()=>{
-  const blob=new Blob([document.getElementById('jsonOut').value],{type:'application/json'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download=(state.meta.name||'theme')+'.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},0);
-};
-document.getElementById('open').onclick=()=>{
-  const data='data:application/json;charset=utf-8,'+encodeURIComponent(document.getElementById('jsonOut').value);
-  window.open(data,'_blank');
-};
-
-/* Users view toast demo */
-document.addEventListener('click', e=>{
-  if(e.target && e.target.id==='showToastBtn'){
-    let t = document.querySelector('.toast');
-    if(!t){ t = document.createElement('div'); t.className='toast'; t.textContent='Themes+ toast preview'; document.body.appendChild(t); }
-    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1200);
-  }
-});
-
-/* Init */
-renderControls();
-applyPalette(state.palette);
-updateThemesPlusIndicators();
-buildJSON();
-</script>
+    const clone = value => JSON.parse(JSON.stringify(value));
+    const isSpec3Theme = candidate => candidate?.main && typeof candidate.main === "object" && (candidate.main.semantic || candidate.main.raw);
+    const prepareTheme = candidate => { if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) throw new Error("The selected file is not a theme JSON object."); const source = clone(candidate); const prepared = isSpec3Theme(source) ? { name: source.display?.name, description: source.display?.description, authors: source.display?.authors, version: source.version, semanticColors: source.main.semantic, rawColors: source.main.raw, plus: source.plus, background: source.background || source.main.background, spec: source.spec } : source; prepared.name = typeof prepared.name === "string" && prepared.name.trim() ? prepared.name.trim() : "Imported theme"; prepared.semanticColors = prepared.semanticColors && typeof prepared.semanticColors === "object" ? prepared.semanticColors : {}; prepared.rawColors = prepared.rawColors && typeof prepared.rawColors === "object" ? prepared.rawColors : {}; prepared.plus = prepared.plus && typeof prepared.plus === "object" ? prepared.plus : {}; delete prepared.plus.icons; prepared.plus.iconpack = prepared.plus.iconpack || "rosiecord-plumpy"; prepared.background = prepared.background?.url ? { ...prepared.background, alpha: Number(prepared.background.alpha ?? prepared.background.opacity ?? defaultBackground.alpha) } : clone(defaultBackground); prepared.spec = prepared.spec || 2; return prepared; };
+    const normaliseHex = value => { const compact = value.trim().replace(/^#/, ""); if (/^[0-9a-f]{3}$/i.test(compact)) return `#${compact.split("").map(character => character + character).join("").toUpperCase()}`; return /^[0-9a-f]{6}$/i.test(compact) ? `#${compact.toUpperCase()}` : null; };
+    const showToast = message => { selectors.toast.textContent = message; selectors.toast.classList.add("show"); window.clearTimeout(showToast.timer); showToast.timer = window.setTimeout(() => selectors.toast.classList.remove("show"), 2400); };
+    const setColor = (key, color) => { const mapping = colorMaps[key]; mapping.semantic.forEach(name => theme.semanticColors[name] = [color]); mapping.raw.forEach(name => theme.rawColors[name] = color); document.documentElement.style.setProperty(`--${key === "hover" ? "accent-hover" : key === "channel" ? "preview-muted" : key === "base" ? "preview-base" : key === "surface" ? "preview-surface" : key === "text" ? "preview-text" : "accent"}`, color); if (key === "text") document.documentElement.style.setProperty("--preview-message-text", color); if (key === "surface") document.documentElement.style.setProperty("--preview-raised", color); };
+    const setSemanticColors = (names, color) => names.forEach(name => theme.semanticColors[name] = [color]);
+    const setRawColors = (names, color) => names.forEach(name => theme.rawColors[name] = color);
+    const updateModeButtons = () => document.querySelectorAll("[data-mode]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.mode === themeMode)));
+    const applyLightTheme = () => {
+      const palette = { base: "#FBF7FF", surface: "#F2E9F8", raised: "#FFFFFF", alt: "#E9DFF0", accent: "#8200C8", hover: "#5C008F", channel: "#7B1FA2", text: "#28152F", muted: "#765B7A" };
+      setColor("accent", palette.accent);
+      setColor("hover", palette.hover);
+      setColor("channel", palette.channel);
+      setColor("base", palette.base);
+      setColor("surface", palette.surface);
+      setColor("text", palette.text);
+      setSemanticColors(["BACKGROUND_FLOATING", "BACKGROUND_NESTED_FLOATING", "CARD_PRIMARY_BG", "CARD_SECONDARY_BG", "EMBED_BACKGROUND", "PANEL_BG"], palette.raised);
+      setSemanticColors(["BACKGROUND_SECONDARY_ALT", "BACKGROUND_TERTIARY", "BG_BASE_TERTIARY", "KEYBOARD", "REDESIGN_ACTIVITY_CARD_BACKGROUND", "REDESIGN_BUTTON_SECONDARY_ALT_BACKGROUND", "REDESIGN_BUTTON_SECONDARY_BACKGROUND", "REDESIGN_BUTTON_TERTIARY_BACKGROUND"], palette.alt);
+      setSemanticColors(["HEADER_SECONDARY", "INTERACTIVE_TEXT_DEFAULT", "TEXT_SECONDARY"], palette.channel);
+      setSemanticColors(["TEXT_MUTED"], palette.muted);
+      setSemanticColors(["BACKGROUND_MESSAGE_HOVER", "BACKGROUND_MODIFIER_ACCENT", "BACKGROUND_MODIFIER_ACTIVE", "BACKGROUND_MODIFIER_HOVER", "BACKGROUND_MODIFIER_SELECTED", "BORDER_FAINT", "BORDER_SUBTLE", "BORDER_STRONG", "REDESIGN_BUTTON_SECONDARY_BORDER", "BG_MOD_FAINT"], "#28152F1A");
+      setRawColors(["PLUM_18", "PRIMARY_645", "PRIMARY_800"], palette.alt);
+      setRawColors(["PLUM_16", "PLUM_19", "PLUM_21", "PLUM_22", "PRIMARY_460", "PRIMARY_630", "PRIMARY_660", "PRIMARY_700"], palette.surface);
+      setRawColors(["PLUM_17", "PLUM_20", "PLUM_24", "PLUM_25", "PRIMARY_600"], palette.base);
+      setRawColors(["WHITE_500", "PLUM_1", "PLUM_4", "PLUM_6", "BRAND_730", "PRIMARY_200", "PRIMARY_330"], palette.text);
+      theme.description = "Clean, light-purple Nightshade aesthetic";
+      themeMode = "light";
+      syncInputsFromTheme();
+      updateModeButtons();
+      showToast("Light purple preset applied");
+    };
+    const activeBackgroundUrl = () => selectors.backgroundUrl.value.trim() || defaultBackground.url;
+    const updatePreviewBackground = () => { const url = activeBackgroundUrl(); const alpha = Number(selectors.alpha.value) / 100; selectors.alphaOutput.value = `${Math.round(alpha * 100)}%`; selectors.backgroundControls.hidden = !selectors.backgroundEnabled.checked; if (!selectors.backgroundEnabled.checked || alpha === 0) { selectors.preview.style.setProperty("--preview-background", "none"); selectors.preview.style.setProperty("--preview-panel-opacity", "100%"); return; } const overlay = `linear-gradient(rgba(15, 15, 16, ${1 - alpha}), rgba(15, 15, 16, ${1 - alpha}))`; const panelOpacity = Math.max(5, Math.round((1 - alpha) * 100)); selectors.preview.style.setProperty("--preview-background", `${overlay}, url("${url.replaceAll('"', '%22')}")`); selectors.preview.style.setProperty("--preview-panel-opacity", `${panelOpacity}%`); selectors.preview.style.backgroundSize = selectors.backgroundSize.value; selectors.preview.style.backgroundPosition = selectors.backgroundPosition.value; };
+    const readColorInputs = () => { document.querySelectorAll("[data-hex]").forEach(input => { const key = input.dataset.hex; const color = normaliseHex(input.value); const swatch = document.querySelector(`[data-swatch="${key}"]`); if (!color) { input.setCustomValidity("Use a hex code such as #8200C8."); return; } input.setCustomValidity(""); input.value = color; swatch.value = color; setColor(key, color); }); };
+    const syncInputsFromTheme = () => { const values = { accent: theme.semanticColors.BACKGROUND_ACCENT?.[0] || "#8200C8", hover: theme.semanticColors.INTERACTIVE_HOVER?.[0] || "#3D007A", channel: theme.semanticColors.CHANNELS_DEFAULT?.[0] || "#D359FF", base: theme.semanticColors.BACKGROUND_PRIMARY?.[0] || "#0F0F10", surface: theme.semanticColors.BACKGROUND_SECONDARY?.[0] || "#121214", text: theme.semanticColors.TEXT_PRIMARY?.[0] || "#E9D9FF" }; Object.entries(values).forEach(([key, color]) => { const normalised = normaliseHex(color) || "#8200C8"; document.querySelector(`[data-hex="${key}"]`).value = normalised; document.querySelector(`[data-swatch="${key}"]`).value = normalised; setColor(key, normalised); }); const background = theme.background; selectors.backgroundEnabled.checked = Boolean(background?.url); selectors.backgroundUrl.value = background?.url === defaultBackground.url ? "" : background?.url || ""; selectors.alpha.value = Math.round((background?.alpha ?? defaultBackground.alpha) * 100); selectors.backgroundSize.value = background?.size || defaultBackground.size; selectors.backgroundPosition.value = background?.position || defaultBackground.position; updatePreviewBackground(); };
+    const renderIconPacks = () => { const active = theme.plus?.iconpack || "rosiecord-plumpy"; selectors.iconPacks.innerHTML = iconPacks.map(iconPack => `<label class="icon-option"><input type="radio" name="iconPack" value="${iconPack}" ${iconPack === active ? "checked" : ""}><span>${iconPack}</span></label>`).join(""); };
+    const updateBackground = () => { const alpha = Number(selectors.alpha.value) / 100; if (!selectors.backgroundEnabled.checked || alpha === 0) delete theme.background; else theme.background = { url: activeBackgroundUrl(), alpha, size: selectors.backgroundSize.value, position: selectors.backgroundPosition.value }; updatePreviewBackground(); };
+    const syncMetadata = () => { const author = theme.authors?.[0] || {}; const isDefaultTheme = theme.name === "Nightshade" && theme.version === "3" && theme.description === "Clean, midnight-purple aesthetic"; const isPlaceholderAuthor = author.name === "Theme author" && author.id === "000000000000000000"; selectors.themeName.value = isDefaultTheme ? "" : theme.name || ""; selectors.themeVersion.value = isDefaultTheme ? "" : theme.version || ""; selectors.themeDescription.value = isDefaultTheme ? "" : theme.description || ""; selectors.authorName.value = isPlaceholderAuthor ? "" : author.name || ""; selectors.authorId.value = isPlaceholderAuthor ? "" : author.id || ""; selectors.editorThemeName.textContent = theme.name || "Untitled theme"; selectors.previewThemeName.textContent = theme.name || "Untitled theme"; selectors.previewThemeDescription.textContent = theme.description || "No description yet."; selectors.previewAuthorName.textContent = author.name || theme.name || "Theme"; };
+    const updateMetadata = (sync = true) => { const themeName = selectors.themeName.value.trim(); const version = selectors.themeVersion.value.trim(); const description = selectors.themeDescription.value.trim(); if (themeName) theme.name = themeName; if (version) theme.version = version; if (description) theme.description = description; const name = selectors.authorName.value.trim(); const id = selectors.authorId.value.trim(); if (name || id) theme.authors = [{ ...(name ? { name } : {}), ...(id ? { id } : {}) }]; if (sync) syncMetadata(); else { const author = theme.authors?.[0] || {}; selectors.editorThemeName.textContent = theme.name || "Untitled theme"; selectors.previewThemeName.textContent = theme.name || "Untitled theme"; selectors.previewThemeDescription.textContent = theme.description || "No description yet."; selectors.previewAuthorName.textContent = author.name || theme.name || "Theme"; } };
+    const updateIconPack = event => { if (event.target.name !== "iconPack") return; theme.plus = theme.plus || {}; theme.plus.iconpack = event.target.value; renderIconPacks(); showToast(`${event.target.value} selected`); };
+    const buildJson = () => { readColorInputs(); updateMetadata(); updateBackground(); const exported = exportFormat === "spec3" ? { spec: 3, version: theme.version || "1.0.0", ...(themeId ? { id: themeId } : {}), display: { name: theme.name, ...(theme.description ? { description: theme.description } : {}), ...(Array.isArray(theme.authors) ? { authors: theme.authors } : {}) }, main: { type: themeType, semantic: theme.semanticColors, raw: theme.rawColors }, ...(theme.background ? { background: theme.background } : {}), plus: theme.plus } : theme; return JSON.stringify(exported, null, 2); };
+    const download = () => { const blob = new Blob([buildJson()], { type: "application/json" }); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = "Nightshade.json"; anchor.click(); URL.revokeObjectURL(url); showToast("Nightshade.json downloaded"); };
+    const copy = async () => { const json = buildJson(); try { await navigator.clipboard.writeText(json); } catch { const area = document.createElement("textarea"); area.value = json; document.body.append(area); area.select(); document.execCommand("copy"); area.remove(); } showToast("Theme JSON copied"); };
+    const reset = () => { theme = clone(originalTheme); themeMode = "dark"; syncInputsFromTheme(); syncMetadata(); renderIconPacks(); updateModeButtons(); showToast("Restored original Nightshade"); };
+    const loadImportedTheme = candidate => { exportFormat = isSpec3Theme(candidate) ? "spec3" : "legacy"; themeId = exportFormat === "spec3" ? candidate.id || null : null; themeType = exportFormat === "spec3" ? candidate.main.type || "dark" : "dark"; originalTheme = prepareTheme(candidate); theme = clone(originalTheme); themeMode = "custom"; syncInputsFromTheme(); syncMetadata(); renderIconPacks(); updateModeButtons(); selectors.status.textContent = `Imported ${theme.name}`; showToast(`${theme.name} imported`); };
+    const importTheme = async event => { const file = event.target.files?.[0]; if (!file) return; try { if (file.size > 1_000_000) throw new Error("Choose a theme file smaller than 1 MB."); loadImportedTheme(JSON.parse(await file.text())); } catch (error) { showToast(error.message || "Could not import that theme."); } finally { event.target.value = ""; } };
+    const importThemeFromUrl = async () => { const url = selectors.importUrl.value.trim(); try { const parsed = new URL(url); if (!/^https?:$/.test(parsed.protocol)) throw new Error("Use an http or https theme URL."); selectors.importUrlButton.disabled = true; selectors.importUrlButton.textContent = "Loading…"; const response = await fetch(parsed.href, { cache: "no-store" }); if (!response.ok) throw new Error(`The link returned HTTP ${response.status}.`); const text = await response.text(); if (text.length > 1_000_000) throw new Error("Choose a theme file smaller than 1 MB."); loadImportedTheme(JSON.parse(text)); } catch (error) { showToast(error instanceof TypeError ? "That host blocks browser imports. Download the JSON and use Import JSON instead." : error.message || "Could not import that link."); } finally { selectors.importUrlButton.disabled = false; selectors.importUrlButton.textContent = "Import link"; } };
+    const initialize = () => { originalTheme = prepareTheme(createEmbeddedTheme()); theme = clone(originalTheme); syncInputsFromTheme(); syncMetadata(); renderIconPacks(); selectors.status.textContent = "Loaded embedded theme"; };
+    document.querySelectorAll("[data-hex]").forEach(input => input.addEventListener("input", readColorInputs));
+    document.querySelectorAll("[data-swatch]").forEach(input => input.addEventListener("input", event => { const key = event.target.dataset.swatch; const color = event.target.value.toUpperCase(); document.querySelector(`[data-hex="${key}"]`).value = color; setColor(key, color); }));
+    [selectors.alpha, selectors.backgroundUrl, selectors.backgroundSize, selectors.backgroundPosition, selectors.backgroundEnabled].forEach(input => input.addEventListener(input === selectors.alpha ? "input" : "change", updateBackground));
+    selectors.iconPacks.addEventListener("change", updateIconPack);
+    selectors.previewHoverToggle.addEventListener("click", () => { const isActive = selectors.preview.closest(".preview").classList.toggle("hover-preview"); selectors.previewHoverToggle.setAttribute("aria-pressed", String(isActive)); });
+    document.querySelectorAll("[data-mode]").forEach(button => button.addEventListener("click", () => { if (button.dataset.mode === "light") applyLightTheme(); else reset(); }));
+    document.querySelector("#importButton").addEventListener("click", () => selectors.importInput.click());
+    selectors.importInput.addEventListener("change", importTheme);
+    selectors.importUrlButton.addEventListener("click", importThemeFromUrl);
+    selectors.importUrl.addEventListener("keydown", event => { if (event.key === "Enter") importThemeFromUrl(); });
+    [selectors.themeName, selectors.themeVersion, selectors.themeDescription, selectors.authorName, selectors.authorId].forEach(input => input.addEventListener("input", () => updateMetadata(false)));
+    document.querySelector("#downloadButton").addEventListener("click", download);
+    document.querySelector("#copyButton").addEventListener("click", copy);
+    document.querySelector("#resetButton").addEventListener("click", reset);
+    initialize();
+  </script>
 </body>
 </html>
